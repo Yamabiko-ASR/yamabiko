@@ -1,0 +1,109 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+
+# Virtual environments (.venv* also covers local backups/renames of the
+# build venv, e.g. .venv-contaminated-<date>/ during a lock regeneration)
+.venv*/
+venv/
+env/
+
+# Local model-conversion scratch envs and staged weights (never shipped)
+.asr-convert/
+models-staging/
+
+# Test / lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.mutmut-cache
+.mutmut-cache.*
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+# The checked-in specs are source, not build artifacts.
+!installer/yamabiko.spec
+!scripts/validate_named_event_child.spec
+# Final NSIS installer output can be hundreds of MB; GitHub rejects files
+# over 100 MB. Distributed via GitHub Releases, not committed.
+installer/*.exe
+
+# IDE / OS
+.vscode/
+.idea/
+.vs/
+*.swp
+Thumbs.db
+.DS_Store
+
+# Local tooling and assistant state (not part of the shipped project)
+.claude/
+.codex/
+.agents/
+.codex-log/
+.worktrees/
+CLAUDE.md
+AGENTS.md
+*.AGENTS.md
+
+# Internal development history (kept locally, not shipped publicly)
+docs/_internal/
+# Session working docs (reviews, plans, specs, go/no-go boards): same
+# class as docs/_internal/ but written to docs/ root by assistant
+# sessions. Date-stamped, local-only; promote to a tracked doc
+# deliberately if one becomes permanent.
+docs/PLAN-*.md
+docs/CODE-REVIEW-*.md
+docs/PR-REVIEW-*.md
+docs/SPEC-*.md
+docs/GO-NO-GO-*.md
+docs/BACKLOG-*.md
+docs/superpowers/
+
+# Real-user test evidence (logs + screenshots from tester machines;
+# contains personal data, never commit)
+Wife_Testing/
+
+# Audio captures, generated samples, and downloaded test audio
+# (hand-picked assets live in assets/)
+*.wav
+*.mp3
+
+# Design-source exports (e.g. Figma layer zips) and other stray archives;
+# flattened results are committed under assets/, the sources stay local
+*.zip
+
+# Logs
+*.log
+
+# Model weights: downloaded on first run or bundled by the installer
+models/
+*.gguf
+*.onnx
+# The sound tagger ships inside the installer, so it is tracked.
+!yamabiko/vad/data/efficientsed-fmn10-tf256-kd.onnx
+*.ct2
+*.bin
+*.safetensors
+
+# Scratch / exploration work
+scratch/
+.cache/
+
+# Preflight success stamp (local timing marker, not a build artifact)
+scripts/.preflight-stamp
+
+# Vendored llama.cpp binaries (too large for git; fetched/built separately).
+# **/ also covers nested CUDA DLL layouts (third_party/llama.cpp/cuda/*.dll).
+third_party/llama.cpp/**/*.exe
+third_party/llama.cpp/**/*.dll
+
+# Superpowers brainstorm visual companion
+.superpowers/

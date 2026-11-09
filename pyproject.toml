@@ -1,0 +1,79 @@
+# Yamabiko packaging + dependency metadata.
+#
+# This file is the install-time "source of truth" for the package's
+# version and runtime dependencies. Before it existed:
+#   * `pip install -e .` errored on every CI run ("neither setup.py nor
+#     pyproject.toml found") -- harmless but noisy, and it meant the
+#     editable install never actually pinned anything.
+#   * yamabiko/requirements.txt's version floors were documentation
+#     only; nothing enforced them, so a venv could (and did) drift below
+#     them -- the local dev venv ended up on huggingface_hub 0.36.2,
+#     under the >=1.1.0 floor, which silently breaks the wizard's
+#     first-run download (missing tqdm_class kwarg).
+#
+# With this file, `pip install -e .` installs the pinned runtime deps
+# (read from the single requirements.txt source) and a version bump
+# only happens in one place (yamabiko/__init__.py::__version__).
+#
+# The CI pip cache (.github/workflows/*.yml `cache-dependency-path`)
+# already references pyproject.toml, anticipating this file.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yamabiko"
+description = "Real-time Japanese-audio to English-subtitle overlay for Windows."
+readme = "README.md"
+# huggingface_hub 1.10+ requires Python >=3.10, and the codebase uses
+# PEP 604 unions (X | Y) outside annotations; the bundle + CI ship 3.12.
+requires-python = ">=3.10"
+authors = [{ name = "Christian Allen" }]
+# Version comes from yamabiko/__init__.py (single source of truth);
+# dependencies come from yamabiko/requirements.txt (single source of
+# truth). Both are resolved by setuptools at build time -- see
+# [tool.setuptools.dynamic] below.
+dynamic = ["version", "dependencies"]
+
+[tool.setuptools.dynamic]
+version = { attr = "yamabiko.__version__" }
+dependencies = { file = ["yamabiko/requirements.txt"] }
+
+[tool.setuptools.packages.find]
+# Ship only the active package tree. The legacy realtimejpsubs/ tree
+# (pre-rename leftover, no top-level __init__.py, untracked) and the
+# tests/ + installer/ trees must not be packaged.
+include = ["yamabiko*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+# Runtime-read data files that must ship inside the wheel next to the
+# .py modules. Without them an installed wheel resolves
+# paths.shipped_defaults_path() / paths.bundle_data_dir() to files that
+# do not exist. (The PyInstaller installer ships these via its own spec
+# `datas=`; nothing in-repo currently builds a wheel, but the wheel path
+# must be correct -- see tests/test_wheel_packaging.py.)
+#
+# glossaries/ has no __init__.py so it is NOT a package: its data files
+# attach to the top-level `yamabiko` package via a relative glob. The
+# whole directory ships, not just *.json -- _seed.yaml (read directly by
+# main.py), _denylist.txt (read by the romanization pipeline), and
+# user.yaml (seeded to app-data on first run) are all runtime-read.
+# static/ lives under the `yamabiko.display` package. vad/data/ (the bundled
+# sound-tagger ONNX graph and its licence, read by
+# vad.sound_tagger.default_model_path()) attaches to `yamabiko.vad` the same
+# way glossaries/ attaches to `yamabiko`. overlay_app/assets/ (the Settings
+# preview photo and its license, read by preview_monitor.photo_path())
+# attaches to `yamabiko.overlay_app`.
+yamabiko = ["default_config.yaml", "glossaries/*"]
+"yamabiko.display" = ["static/*", "static/fonts/*"]
+"yamabiko.vad" = ["data/*"]
+"yamabiko.overlay_app" = ["assets/*"]
+
+[tool.ruff.lint]
+# Classic pyflakes + pycodestyle error subset. Ruff 0.17 widened its
+# built-in default selection to several hundred rules, so the set is
+# pinned here to keep `python -m ruff check` stable across upgrades.
+# The repo-wide baseline is not clean yet: lint the paths you change.
+select = ["E4", "E7", "E9", "F"]

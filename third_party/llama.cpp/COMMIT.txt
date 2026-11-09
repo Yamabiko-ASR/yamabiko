@@ -1,0 +1,39 @@
+# Pinned upstream build manifest for the vendored llama-server.exe.
+#
+# This file records the exact upstream commit + build host + compile flags
+# used to produce the llama-server.exe and CUDA DLLs that live beside it
+# in this directory.
+#
+# Update this file any time the binary is refreshed. The goal is that any
+# contributor with the recorded host + flags can rebuild a bit-identical
+# binary from the recorded commit.
+
+upstream: https://github.com/ggml-org/llama.cpp
+commit:   25eec6f32713886390debe9b03785aa82f015ce3
+tag:      untagged
+built:    2026-06-10
+host:     Windows 11 / NVIDIA RTX 5080 (sm_120) / CUDA 12.9.86 (user-local
+          toolkit, extracted from cuda_12.9.1_576.57_windows.exe) /
+          MSVC 19.44.35228 / cmake 4.3.3 / Ninja
+flags:    -DCMAKE_BUILD_TYPE=Release -DGGML_CUDA=ON -DGGML_CUDA_F16=ON
+          -DBUILD_SHARED_LIBS=ON
+arch:     project defaults (CMAKE_CUDA_ARCHITECTURES unset) under CUDA 12.9:
+          50-virtual 61-virtual 70-virtual 75-virtual 80-virtual
+          86-real 89-real 120a-real 121a-real
+          (sm_120 confirmed at runtime: ggml_cuda_init detects the 5080,
+          37/37 layers offload, real /v1/chat/completions served)
+
+# WHY CUDA 12.9 (audit 2026-06-04 bundle-1 / review F13): the previous
+# 2026-04-05 build used CUDA 13.0, whose runtime requires an r580+ driver
+# -- above the project's documented 572.83 floor, so users on r572-579
+# drivers got a working ASR but a translator that never started. CUDA 12.x
+# runtimes initialize on any r525+ driver (minor-version compatibility),
+# comfortably under the documented floor. The runtime DLLs beside the exe
+# are the *_12 family (cublas64_12, cublasLt64_12, cudart64_12), sourced
+# from the same 12.9 toolkit that built the binary; installer/
+# llama-manifest.txt names them in lockstep.
+#
+# Note: BUILD_SHARED_LIBS is ON (vs the upstream default OFF) because this
+# build produces separate ggml*.dll / llama.dll / mtmd.dll sidecars
+# co-located with llama-server.exe, which is the layout the manifest +
+# watchdog spawn assume.

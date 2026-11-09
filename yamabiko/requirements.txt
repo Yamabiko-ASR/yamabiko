@@ -1,0 +1,124 @@
+# Yamabiko no longer depends on torch at runtime: the Silero VAD runs
+# through onnxruntime, and faster-whisper tokenization uses pure
+# `tokenizers` (Rust) instead of `transformers.AutoTokenizer`.
+# faster-whisper / ctranslate2 also avoid torch. If you reintroduce any
+# torch-bearing dep, install torch separately for Blackwell (sm_120):
+#   pip install --index-url https://download.pytorch.org/whl/cu128 torch
+
+# --- Audio capture (WASAPI loopback on Windows) ---
+PyAudioWPatch>=0.2.12.8
+# Stateful, band-limited conversion from common WASAPI device rates to the
+# 16 kHz mono stream consumed by Silero and Whisper.
+soxr>=1.1,<2
+
+# --- VAD ---
+# A pinned community Silero VAD v5-era ONNX graph is fetched by the
+# first-run wizard and loaded via onnxruntime directly. We used to pin
+# `silero-vad>=6.0.0` but that pkg
+# hard-requires torch (~3 GB CUDA DLLs) for a 2 MB model — not worth it.
+
+# --- ASR ---
+# IMPORTANT: force compute_type="float16" in config — INT8 crashes on sm_120.
+faster-whisper==1.2.1
+# CT2 4.7.1 aborts in the Python 3.12 build venv on the kotoba CUDA
+# real-path ASR test (0xC0000409), so it was rejected. 4.8.3 is the
+# floor: 4.8.1 to 4.8.3 harden loading of downloaded model files (a heap
+# overflow, out-of-bounds reads, unchecked allocation sizes) and fix a
+# Windows CUDA process kill in Whisper word alignment. The 4.8 Windows
+# wheels still need CUDA 12 cuBLAS and cuDNN 9, like 4.7.
+ctranslate2>=4.8.3,<4.9
+# CTranslate2 4.5+ needs CUDA 12.3+ cuBLAS and cuDNN 9 on Windows. The
+# CT2 wheel bundles cudnn64_9.dll (front loader only) + libiomp5md.dll
+# but NOT cublas*.dll, nor the cuDNN 9 sub-DLLs. These are pinned via
+# the NVIDIA redistributable wheels explicitly. The installer spec
+# collects the DLLs from these packages and flattens them next to
+# ctranslate2.dll — see installer/yamabiko.spec.
+nvidia-cublas-cu12>=12.4,<13
+nvidia-cudnn-cu12>=9,<10
+# NVRTC is a transitive dep of cuBLAS + cuDNN (cublasLt64_12.dll and
+# cudnn_engines_precompiled64_9.dll both import nvrtc64_120_0.dll).
+# Pin it explicitly so a future cublas/cudnn upgrade that drops the
+# transitive is caught at install time, not at runtime.
+nvidia-cuda-nvrtc-cu12>=12.4,<13
+
+# --- Translation client ---
+httpx>=0.27.0                   # async OpenAI-compatible client
+
+# --- UI ---
+# PySide6 6.12.0 crashes with an access violation during interpreter exit
+# once Qt widgets have been created (seen on Windows under pytest, where it
+# fails CI runs whose tests all passed). The release lock ships 6.11.0.
+PySide6>=6.8.0,<6.12            # LGPL; preferred over PyQt6 for distribution freedom
+fastapi>=0.115.0                # browser overlay server
+uvicorn>=0.32.0
+websockets>=13.0
+
+# --- Config, glue, utilities ---
+pyyaml>=6.0
+numpy>=1.26.0
+# Cross-process writer lock for user_overrides.yaml. Pure Python,
+# no data files; was already shipped as a huggingface_hub transitive,
+# declared explicitly because config_writer imports it directly.
+# Floor 4.2.1 fixes GHSA-567q-5qvw-pf92 (a Windows oplock on a soft
+# lock's marker), GHSA-9vhv-jxww-xfm5 and GHSA-v4x8-3wr5-3wq8 (the
+# SQLite-backed ReadWriteLock).
+filelock>=4.2.1,<5
+# Direct import in update_check.py (packaging.version); was riding the
+# huggingface_hub transitive. Floor matches hf_hub's own
+# packaging>=20.9 floor so no resolver conflict is possible. A missing
+# packaging crashes the overlay process at launch (overlay_app/__main__
+# imports update_check at module level).
+packaging>=20.9
+
+# --- Romanization ---
+cutlet>=0.4.0                   # Hepburn with macrons; uses fugashi + unidic-lite
+# Direct import in romanization/extractor_fugashi.py; was riding the
+# cutlet transitive. The PyInstaller spec already lists
+# fugashi as a first-class hiddenimport — the requirements omission was
+# the only place the direct dep went undeclared.
+fugashi>=1.3
+unidic-lite>=1.0.8              # Bundled MeCab dictionary (cutlet runtime dep)
+sudachipy>=0.6.10
+sudachidict_core>=20250100
+
+# --- Global hotkeys ---
+keyboard>=0.13.5                # global hotkeys on Windows
+
+# --- Sentence splitting ---
+fast-bunkai>=0.1.1              # Rust-accelerated JP sentence splitter (PyPI max version is 0.1.1)
+
+# --- ONNX + tokenizer runtime (Silero VAD + faster-whisper) ---
+onnxruntime>=1.18               # runs Silero VAD ONNX on CPU
+tokenizers>=0.20                # pure-Rust tokenizer used by faster-whisper (avoids transformers->torch)
+
+# --- HuggingFace downloads ---
+# hf_xet is the xet-core Python binding; required for fast multi-GB model
+# downloads. All HF repos are Xet-enabled as of 2026; without this package
+# huggingface_hub falls back to single-stream HTTP capped around ~3 MB/s,
+# making first-run wizard downloads painfully slow on fast connections.
+hf_xet>=1.4.0
+# Direct import in wizard_pages/downloads.py (_make_progress_tqdm builds
+# the byte-level progress subclass from tqdm.auto); was riding the
+# huggingface_hub transitive. Floor matches hf_hub's own
+# tqdm>=4.42.1 floor so no resolver conflict is possible.
+tqdm>=4.42.1
+# hf_hub_download gained the tqdm_class= kwarg in huggingface_hub 1.1.0
+# (PR #3531). v1.0.0 / v1.0.1 -- and all of 0.x -- lack it.
+# yamabiko/wizard_pages/downloads.py::_hub_progress_hook passes
+# tqdm_class when the installed signature accepts it and falls back to
+# rebinding huggingface_hub.utils.tqdm's module-global class otherwise
+# (a drifted dev venv resolved 0.36.2 once -- see pyproject.toml), so a
+# hub below the floor degrades gracefully instead of raising TypeError
+# on the first wizard download. The 1.1.0 floor stays: the 1.x line is
+# what the bundle validates and ships. Guarded by
+# tests/test_real_hf_signature.py. (huggingface_hub 1.10+ requires
+# Python >=3.10; the bundle + CI ship 3.12, so the <2 cap is safe.)
+huggingface_hub>=1.1.0,<2
+
+# NOTE: test + release-gate tooling (pytest, pytest-asyncio, pytest-qt,
+# pytest-timeout, pefile, psutil) is NOT a runtime dependency and lives
+# in requirements-dev.txt at the repo root. This file is the library's
+# runtime metadata (read by pyproject's dynamic `dependencies`); it must
+# stay free of dev-only tools so `pip install yamabiko` ships lean.
+# requirements-dev.txt `-r`-includes this file, so dev machines still
+# get everything with one install.

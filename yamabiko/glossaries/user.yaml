@@ -1,0 +1,21 @@
+# User-maintained proper-noun glossary for yamabiko.
+#
+# Entries here override auto-detected forms and persist across genre switches.
+# Edit by hand; the pipeline never writes to this file.
+#
+# Format:
+#   entries:
+#     <japanese-surface>:
+#       en: <english-or-romanized-form>
+#       reading: <hiragana-for-furigana>   # optional; used above kanji in JP line
+#
+# Example:
+#   entries:
+#     田中:
+#       en: Tanaka
+#       reading: たなか
+#     東京:
+#       en: Tōkyō
+#       reading: とうきょう
+
+entries: {}

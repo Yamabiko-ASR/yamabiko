@@ -1,0 +1,7 @@
+{"name": "ft-pilot-v2b", "seed": 20261027,
+ "trainable": "decoder", "encoder_dtype": "float16", "decoder_master_dtype": "float32", "autocast": "bfloat16",
+ "epochs": 2, "batch_windows": 32, "batch_windows_16gb": 16, "grad_accumulation_16gb": 2,
+ "lr_peak": 1e-5, "lr_final": 1e-6, "warmup_steps": 200, "schedule": "cosine",
+ "adamw": {"betas": [0.9, 0.98], "eps": 1e-6, "weight_decay": 0.0}, "grad_clip": 1.0,
+ "anchor": {"tau": 2.0, "lambda_start": 1.0, "lambda_floor": 0.5, "hold_until": 0.10, "floor_at": 0.60},
+ "dev_every_steps": 500, "checkpoint_epochs": [1, 2]}

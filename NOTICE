@@ -1,0 +1,230 @@
+Yamabiko NOTICE
+
+Yamabiko™ is an unregistered trademark of Christian Allen. The PolyForm
+Noncommercial 1.0.0 license under which Yamabiko is distributed does not
+grant trademark rights; forks and derivative works must not use the
+"Yamabiko" name or logo to identify themselves without separate permission.
+
+License-violation reports, IP claims, and trademark questions:
+<callen00@proton.me>.
+
+---
+
+This software uses the following third-party components. See each
+component's license for its specific terms; Yamabiko's PolyForm
+Noncommercial grant does not supersede them.
+
+The complete component and license-text index for each binary distribution is
+generated from its bundle inventory and ships in _internal/licenses/INDEX.txt.
+
+---
+
+Code dependencies:
+
+- llama.cpp (native binary; not llama-cpp-python) - MIT License - https://github.com/ggml-org/llama.cpp
+- faster-whisper - MIT License - https://github.com/SYSTRAN/faster-whisper
+- CTranslate2 (native inference engine; ships as ctranslate2.dll and its
+  CUDA sidecars, and is what actually runs the Whisper model under
+  faster-whisper) - MIT License - https://github.com/OpenNMT/CTranslate2
+- PySide6 (Qt for Python) - LGPL-3.0 - https://wiki.qt.io/Qt_for_Python
+  Dynamically linked: the Qt libraries ship as separate DLLs in the
+  install directory and may be replaced by the user, per LGPL-3.0.
+  Source of the bundled PySide6 6.11.0:
+  https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.11.0-src/
+- silero-vad - MIT License - https://github.com/snakers4/silero-vad
+- PyAudioWPatch - MIT License - https://github.com/s0d3s/PyAudioWPatch
+- fastapi - MIT License - https://github.com/tiangolo/fastapi
+- uvicorn - BSD-3-Clause - https://github.com/encode/uvicorn
+- websockets - BSD-3-Clause - https://github.com/python-websockets/websockets
+- httpx - BSD-3-Clause - https://github.com/encode/httpx
+- pyyaml - MIT License - https://github.com/yaml/pyyaml
+- filelock - MIT License - https://github.com/tox-dev/filelock
+- numpy - BSD-3-Clause - https://github.com/numpy/numpy
+- python-soxr / libsoxr (stateful capture sample-rate conversion; wheel also
+  includes PFFFT) - LGPL-2.1-or-later, with PFFFT under BSD-3-Clause -
+  https://github.com/dofuuz/python-soxr
+  The exact source of the bundled version, soxr-1.1.0.tar.gz, is published
+  as an asset of every Yamabiko GitHub release. The Python wrapper ships as
+  replaceable .py source files in _internal/soxr/, next to the native
+  soxr_ext extension that statically links libsoxr.
+- cutlet - MIT License - https://github.com/polm/cutlet
+- fugashi - MIT License, with BSD-3-Clause MeCab-derived portions -
+  https://github.com/polm/fugashi
+- unidic-lite (code MIT/WTFPL; bundled UniDic 2.1.2 data BSD) - https://github.com/polm/unidic-lite
+  UniDic attribution: "Unidic-mecab 2.1.2, The UniDic Consortium /
+  National Institute for Japanese Language and Linguistics (NINJAL),
+  https://clrd.ninjal.ac.jp/unidic/"
+- sudachipy - Apache-2.0 - https://github.com/WorksApplications/sudachi.rs
+  (the 0.6.x wheels we pin are built from sudachi.rs; the older
+  WorksApplications/SudachiPy repo is the archived pure-Python 0.5.x line)
+- sudachidict_core - Apache-2.0 (code) / dictionary data derived from
+  UniDic-MeCab - https://github.com/WorksApplications/SudachiDict
+- fast-bunkai - Apache-2.0 - https://github.com/hotchpotch/fast-bunkai
+  Provenance note: upstream states "Apache License 2.0" in its README but
+  ships no LICENSE file, and its pyproject/Cargo/PyPI metadata declare no
+  license. The Apache-2.0 text we bundle for it is the canonical text from
+  apache.org, included on the basis of that README declaration. Recorded
+  here so the basis of the claim is auditable.
+- onnxruntime - MIT License - https://github.com/microsoft/onnxruntime
+- tokenizers (HuggingFace) - Apache-2.0 - https://github.com/huggingface/tokenizers
+- huggingface_hub - Apache-2.0 - https://github.com/huggingface/huggingface_hub
+- hf_xet - Apache-2.0 - https://github.com/huggingface/xet-core
+- tqdm - MPL-2.0 and MIT (mixed per-file) - https://github.com/tqdm/tqdm
+- packaging - Apache-2.0 / BSD-2-Clause dual - https://github.com/pypa/packaging
+- keyboard - MIT License - https://github.com/boppreh/keyboard
+
+---
+
+Redistributed runtime libraries (bundled in the installer):
+
+- NVIDIA CUDA runtime libraries (cuBLAS, cuDNN, NVRTC; from the
+  nvidia-cublas-cu12 / nvidia-cudnn-cu12 / nvidia-cuda-nvrtc-cu12
+  wheels) - proprietary, redistributable as runtime libraries per the
+  NVIDIA CUDA Toolkit EULA and cuDNN license -
+  https://docs.nvidia.com/cuda/eula/
+- Microsoft Visual C++ Redistributable runtime DLLs - Microsoft
+  Software License Terms (distributable code) -
+  https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files
+
+---
+
+Fonts bundled in the installer:
+
+- BIZ UDPGothic (Regular, Bold) - SIL Open Font License 1.1 -
+  https://github.com/googlefonts/morisawa-biz-ud-gothic
+  Copyright 2022 The BIZ UDGothic Project Authors
+  (https://github.com/googlefonts/morisawa-biz-ud-mincho)
+- BIZ UDPMincho (Regular, Bold) - SIL Open Font License 1.1 -
+  https://github.com/googlefonts/morisawa-biz-ud-mincho
+  Copyright 2022 The BIZ UDMincho Project Authors
+  (https://github.com/googlefonts/morisawa-biz-ud-mincho)
+- Klee One (SemiBold) - SIL Open Font License 1.1 -
+  https://github.com/fontworks-fonts/Klee
+  Copyright 2020 The Klee Project Authors
+  (https://github.com/fontworks-fonts/Klee)
+
+All three ship unmodified as .ttf files in
+_internal/yamabiko/display/static/fonts/ with their license texts beside them
+(OFL-BIZUDPGothic.txt, OFL-BIZUDPMincho.txt, OFL-KleeOne.txt).
+They are used for subtitles and window titles.
+
+Images bundled in the installer:
+
+- "Nakasu Yatai Stalls (19979437930)" by Yoshikazu TAKADA from Tokyo, Japan -
+  Creative Commons Attribution 2.0 Generic (CC BY 2.0) -
+  https://commons.wikimedia.org/wiki/File:Nakasu_Yatai_Stalls_(19979437930).jpg
+  Scaled and cropped; ships as _internal/yamabiko/overlay_app/assets/
+  preview-night.jpg with LICENSE-preview-night.txt beside it. It sits behind
+  the subtitle preview in the Settings window.
+
+---
+
+Network services (queried at runtime; nothing redistributed):
+
+- AniList GraphQL API - https://anilist.co - queried only when the user
+  searches for or picks a series in the optional series-names feature
+  (config key gazetteer.enabled). Series metadata and cover images are
+  fetched at the user's request and cached locally on the user's
+  machine; they are not redistributed with Yamabiko. Cover artwork
+  remains the property of its rights holders. Yamabiko is an unofficial
+  API consumer and is not affiliated with or endorsed by AniList.
+
+---
+
+Model weights bundled in the installer:
+
+- EfficientSED fmn10+TF:256 sound event detector (advanced-KD weights,
+  release v0.0.1), exported to ONNX with its mel frontend in the graph by
+  Yamabiko - MIT License - https://github.com/theMoro/EfficientSED
+  (commit e3449bfd1f4922b81d82410ed842653f462bfca8). Ships as
+  _internal/yamabiko/vad/data/efficientsed-fmn10-tf256-kd.onnx with its
+  license beside it; voice detection uses it to find speech. Trained on
+  AudioSet (labels CC BY 4.0, Google).
+
+    MIT License
+
+    Copyright (c) 2024 Florian Schmid
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Model weights (downloaded on first run, NOT bundled in the installer):
+
+No other model weights are redistributed with Yamabiko. The first-run
+wizard downloads all of the following from their Hugging Face
+repositories into the user's local cache; each entry below names the
+license its repository declares or points to.
+
+- Kodama-1 (Yamabiko-ASR/kodama-1; Japanese speech recognition, faster-whisper /
+  CTranslate2) - Creative Commons Attribution-ShareAlike 4.0 International
+  (CC BY-SA 4.0) - https://huggingface.co/Yamabiko-ASR/kodama-1
+  (revision b077a2add507bf76e8f3b882d97769417ac547f5)
+  License: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+  Copyright (c) 2026 Christian Allen. Provided as is, without warranties
+  of any kind; see section 5 of the license. This license covers the
+  Kodama-1 weights only, not Yamabiko.
+  Kodama-1 is whisper-ja-760M with its decoder fine-tuned, converted to
+  CTranslate2.
+  Base model: whisper-ja-760M by efwkjn - Apache License 2.0 -
+  https://huggingface.co/efwkjn/whisper-ja-760M
+  (license: https://huggingface.co/efwkjn/whisper-ja-760M/blob/main/LICENSE;
+  a copy ships in the Kodama-1 repository as LICENSE-APACHE-2.0).
+  Modified: decoder fine-tuned, converted to CTranslate2.
+  whisper-ja-760M is a Japanese fine-tune of openai/whisper-large-v3-turbo,
+  https://huggingface.co/openai/whisper-large-v3-turbo
+  OpenAI Whisper license notice:
+
+    MIT License
+
+    Copyright (c) 2022 OpenAI
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  Kodama-1 training data:
+  - ReazonSpeech v2, https://research.reazon.jp/projects/ReazonSpeech/
+    (used under Article 30-4 of the Japanese Copyright Act)
+  - OOPPEENN visual-novel dataset,
+    https://huggingface.co/datasets/OOPPEENN/56697375616C4E6F76656C5F44617461736574
+  - JVNV (Xin et al., https://arxiv.org/abs/2310.06072) and JNV (Xin et al.,
+    https://arxiv.org/abs/2305.12445), both CC BY-SA 4.0
+  - MUSAN (Snyder et al., https://www.openslr.org/17/), CC BY 4.0
+
+- Qwen3.5-9B (GGUF) - Apache-2.0 -
+  https://huggingface.co/dahara1/Qwen3.5-9B-UD-japanese-imatrix
+  Translation model (both quant tiers). Japanese-imatrix GGUF
+  quantization by dahara1 of Qwen3.5-9B (Apache-2.0, Alibaba Cloud).
+- Pinned community Silero VAD v5-era ONNX graph - MIT License -
+  https://huggingface.co/onnx-community/silero-vad

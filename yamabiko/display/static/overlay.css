@@ -1,0 +1,240 @@
+/* Bundled SIL OFL fonts (see NOTICE); the same files Qt registers. */
+@font-face {
+  font-family: "BIZ UDPGothic";
+  src: url("/static/fonts/BIZUDPGothic-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "BIZ UDPGothic";
+  src: url("/static/fonts/BIZUDPGothic-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "BIZ UDPMincho";
+  src: url("/static/fonts/BIZUDPMincho-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "BIZ UDPMincho";
+  src: url("/static/fonts/BIZUDPMincho-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Klee One";
+  src: url("/static/fonts/KleeOne-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+/* Qt lists this face as "Klee One" and "Klee One SemiBold"; Settings may save either. */
+@font-face {
+  font-family: "Klee One SemiBold";
+  src: url("/static/fonts/KleeOne-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+/* "Telop, echoing": the same design as the Qt overlay
+   (yamabiko/overlay_app/telop_look.py). Numbers kept in sync by hand. The
+   pixel sizes (fonts, furigana and row heights per echo age, paddings) are
+   computed and rounded in overlay.js applySizes, as Qt rounds them. */
+:root {
+  --jp-font: "BIZ UDPGothic", sans-serif;
+  --en-font: "Bahnschrift", "Segoe UI", sans-serif;
+  --text-color: rgb(255, 255, 255);
+  --echo-kana: rgba(255, 255, 255, 0.85);
+  --learn-en-color: rgba(255, 255, 255, 0.88);
+  --bar-color: rgba(14, 16, 20, 0.929);  /* 237/255 */
+  --fade-in-ms: 160ms;
+  --fade-out-ms: 420ms;
+  --gutter: 38px;
+  --glide: cubic-bezier(.2, .7, .2, 1);
+}
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: transparent; overflow: hidden; user-select: none;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* The stack: anchored at the default spots (position is Qt-only). Its width
+   is the cap: vw, not %, so it matches Qt's pct x screen-width cap (a % here
+   would be cyclic for the shrink-to-fit lines inside). */
+#stage {
+  position: fixed; bottom: 12vh; display: flex; flex-direction: column;
+  pointer-events: none; width: var(--max-width, 70vw);
+}
+body.align-left #stage { left: 6vw; max-width: 94vw; align-items: flex-start; }
+body.align-center #stage { left: 50%; transform: translateX(-50%); align-items: center; }
+#stage .lines { position: relative; z-index: 1; display: flex; flex-direction: column; width: 100%; }
+body.align-left .lines { align-items: flex-start; }
+body.align-center .lines { align-items: center; }
+
+/* Anchored layer: never travels with a line, reshapes to the newest one. */
+.plate {
+  position: absolute; z-index: 0;
+  transition: left .35s var(--glide), bottom .35s var(--glide), width .35s var(--glide),
+              height .35s var(--glide), opacity var(--fade-in-ms) ease;
+}
+.plate-jp { background-color: #f3eee3; }
+.plate-en { background-color: var(--bar-color); }
+#stage.empty .plate { opacity: 0; transition: opacity var(--fade-out-ms) ease; }
+
+.vt {
+  position: absolute; left: 0; bottom: 0; z-index: 2; box-sizing: border-box;
+  width: var(--gutter); writing-mode: vertical-rl; display: flex; justify-content: center;
+  align-items: center; gap: 8px; padding: 12px 0; background-color: #d2452f; color: #fff;
+  white-space: nowrap; font: 700 18px/1 "BIZ UDPGothic", sans-serif;
+  transition: left .35s var(--glide), bottom .35s var(--glide), min-height .35s var(--glide),
+              background-color .3s ease, opacity var(--fade-in-ms) ease;
+}
+body.paused .vt { background-color: #5b5f66; }
+body:not(.paused) #stage.empty .vt { opacity: 0; transition: opacity var(--fade-out-ms) ease; }
+.vt .ve { display: none; font: 600 15px/1 "Bahnschrift", "Segoe UI", sans-serif; }
+body.tag-en .vt .ve { display: inline; }
+.vt .pg { writing-mode: horizontal-tb; display: inline-flex; gap: 3px; height: 14px; }
+.vt .pg i { display: block; width: 4px; height: 100%; background: currentColor; }
+/* Appearing from empty: geometry lands at once, only the fade-in runs. */
+.instant { transition: opacity var(--fade-in-ms) ease !important; }
+
+/* Text layer. Sizes by echo age (ages past 2 keep the age-2 look). */
+.line {
+  --jp-size: var(--jp-px-0); --kana-size: var(--kana-px-0); --en-size: var(--en-px-0);
+  --jp-line: var(--jp-row-0); --en-line: var(--en-row-0);
+  position: relative; max-width: 100%; box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: flex-start; padding-left: var(--gutter);
+  transition: opacity .35s ease, transform .35s var(--glide);
+}
+.line[data-age="1"] {
+  --jp-size: var(--jp-px-1); --kana-size: var(--kana-px-1); --en-size: var(--en-px-1);
+  --jp-line: var(--jp-row-1); --en-line: var(--en-row-1); opacity: .8;
+}
+.line:not([data-age="0"]):not([data-age="1"]) {
+  --jp-size: var(--jp-px-2); --kana-size: var(--kana-px-2); --en-size: var(--en-px-2);
+  --jp-line: var(--jp-row-2); --en-line: var(--en-row-2); opacity: .55;
+}
+/* Leaving (pushed past max_lines) or expiring (hold over): out of the
+   layout, pinned at its box (overlay.js detach) and fading there; it rises
+   with the stack when a new line arrives. A glide in flight keeps running. */
+.line.leaving, .line.expiring { position: absolute; opacity: 0 !important; }
+.line.leaving {
+  transition: opacity .35s ease, transform .35s var(--glide), bottom .35s var(--glide);
+}
+.line.expiring {
+  transition: opacity var(--fade-out-ms) ease, transform .35s var(--glide),
+              bottom .35s var(--glide);
+}
+body.align-center .line { align-items: stretch; text-align: center; }
+
+.jp {
+  color: #15171b; font-family: var(--jp-font); font-weight: 700;
+  font-size: var(--jp-size); line-height: var(--jp-line); padding: var(--jp-pad);
+  clip-path: inset(0 0 0 0);
+  transition: color .35s ease, font-size .35s ease, line-height .35s ease, padding .35s ease,
+              clip-path .28s cubic-bezier(.3, .6, .2, 1);
+}
+.jp rt {
+  color: rgba(21, 23, 27, .6); font-weight: 400; font-size: var(--kana-size);
+  transition: color .35s ease, font-size .35s ease;
+}
+.en {
+  color: var(--text-color); font-family: var(--en-font); font-weight: 600;
+  font-size: var(--en-size); line-height: var(--en-line); padding: var(--en-pad);
+  clip-path: inset(0 0 0 0); overflow-wrap: anywhere;
+  transition: font-size .35s ease, line-height .35s ease, padding .35s ease,
+              clip-path .28s cubic-bezier(.3, .6, .2, 1) .04s;
+}
+.line.enter .jp, .line.enter .en { clip-path: inset(0 100% 0 0); }
+
+/* Notices (plan phase 4): the お知らせ line while a problem lasts, then the
+   recovery line. A column between the echo and the newest line (flex order:
+   echo 0, notices 1, newest 2); overlay.js sets its bottom margin so it
+   clears the newest line's banner or the paused banner. Same look as the Qt
+   overlay (telop_look.NOTICE_*). */
+.line[data-age="0"] { order: 2; }
+.notices {
+  order: 1; display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
+  max-width: 100%; min-width: 0;
+}
+.notices:empty { display: none; }
+body.align-left .notices { align-items: flex-start; }
+body.align-center .notices { align-items: center; }
+.notice {
+  display: flex; align-items: flex-end; max-width: 100%; min-width: 0;
+  transition: opacity var(--fade-in-ms) ease, transform .35s var(--glide);
+}
+.notice.enter { opacity: 0; }
+.notice .nb {
+  flex: none; box-sizing: border-box; width: var(--gutter); padding: 12px 0;
+  writing-mode: vertical-rl; display: flex; justify-content: center; align-items: center;
+  background-color: #e0a030; color: #1f2421; white-space: nowrap;
+  font: 700 18px/1 "BIZ UDPGothic", sans-serif;
+}
+.notice.recovery .nb { background-color: #1f2421; color: #f3eee3; }
+.notice .nt {
+  display: block; min-width: 0; box-sizing: border-box; padding: 9px 20px 11px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background-color: var(--bar-color); color: #fff; font: 600 24px/30px var(--en-font);
+}
+
+/* Echo: plates gone, outlined text (2 px black at eight offsets + soft 7 px shadow). */
+.line:not([data-age="0"]) .jp, .line:not([data-age="0"]) .en {
+  text-shadow: 2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000,
+               2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+               0 0 7px rgba(0, 0, 0, .85);
+}
+.line:not([data-age="0"]) .jp { color: var(--text-color); padding: var(--echo-jp-pad); }
+.line:not([data-age="0"]) .jp rt { color: var(--echo-kana); }
+.line:not([data-age="0"]) .en { padding: var(--echo-en-pad); }
+body.echo-priority:not(.learn) .line:not([data-age="0"]) .jp { display: none; }
+body.echo-priority.learn .line:not([data-age="0"]) .en { display: none; }
+
+/* Learn: Japanese is the headline (its sizes come from applySizes). */
+body.learn .jp { font-family: "Klee One", "Klee One SemiBold", serif; font-weight: 600; }
+body.learn .jp rt { color: #c23b2e; font-weight: 600; }
+body.learn .line:not([data-age="0"]) .jp rt { color: #f0bf5a; }
+body.learn .en {
+  font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif; font-weight: 400;
+  color: var(--learn-en-color);
+}
+
+/* Reduced motion: lines and plates switch instantly. */
+body.reduce-motion #stage, body.reduce-motion #stage * { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  #stage, #stage * { transition: none !important; }
+}
+
+.status {
+  position: fixed;
+  top: 6px;
+  left: 6px;
+  color: #888;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+  pointer-events: none;
+  /* Fade driven by overlay.js adding .faded after the confirmation
+     window; opacity (not display) so the change transitions smoothly. */
+  transition: opacity 400ms ease-out;
+}
+
+.status.connected { color: #6f6; }
+.status.disconnected { color: #f66; }
+
+/* A healthy badge fades off the OBS capture after ~4 s (overlay.js);
+   any status change rebuilds className, dropping this and re-showing
+   the pill instantly. */
+.status.faded { opacity: 0; }
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+ruby {
+  ruby-position: over;
+}

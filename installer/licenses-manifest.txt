@@ -1,0 +1,48 @@
+# Third-party license override policy. The complete component set is derived
+# from the bundle inventory and generated provenance report; this file supplies
+# reviewed license texts only when a wheel does not ship the applicable text.
+#
+# Shared by:
+#   * scripts/collect_licenses.py    (copies these into _internal/licenses/)
+#   * installer/build.ps1            (runs the collector post-PyInstaller)
+#   * installer/rebuild-fast.ps1     (same)
+#   * tests/test_license_payload.py  (bundle-side drift guard)
+#
+# WHY: MIT and BSD require the copyright + permission notice accompany
+# distributions; Apache-2.0 requires a copy of the License; LGPL-3.0 requires
+# the license text accompany the work. NOTICE names the components, but naming
+# a license is not shipping it. Before this manifest existed the installer
+# shipped CTranslate2, Qt and llama.cpp binaries with none of their license
+# texts.
+#
+# llama.cpp is not listed here: its LICENSE.txt rides along in
+# installer/llama-manifest.txt and is indexed directly from _internal/llama/.
+#
+# Format, one entry per line, '#' comments and blank lines ignored:
+#
+#   file:<canonical-component-id>|<repo-relative-path-under-licenses>
+#       Copy the reviewed repo file into the component's override directory.
+#
+#   alias:<normalized-distribution-name>|<canonical-component-id>
+#       Reuse a canonical component's reviewed files for a related distribution
+#       while keeping that distribution's own provenance identity in the index.
+
+# --- Checked in, because the wheel ships no license text --------------------
+# CTranslate2: native DLL, MIT. Shipped for months with no license text and it
+# was missing from NOTICE entirely until the 2026-07-13 release audit.
+file:ctranslate2|ctranslate2-MIT.txt
+file:onnxruntime|onnxruntime-MIT.txt
+file:tokenizers|tokenizers-Apache-2.0.txt
+file:sudachipy|sudachipy-Apache-2.0.txt
+file:fast-bunkai|fast-bunkai-Apache-2.0.txt
+
+# Qt / PySide6 / shiboken6. We link Qt dynamically and distribute under
+# LGPL-3.0, but the PySide6 wheels ship ONLY LicenseRef-Qt-Commercial.txt --
+# the LGPL text we actually rely on is absent from the wheel, so it has to be
+# vendored. LGPL-3.0 is drafted as additional permissions on top of GPL-3.0 and
+# incorporates it by reference, so both texts ship.
+file:pyside6|Qt-LGPL-3.0.txt
+file:pyside6|Qt-GPL-3.0.txt
+alias:pyside6-addons|pyside6
+alias:pyside6-essentials|pyside6
+alias:shiboken6|pyside6

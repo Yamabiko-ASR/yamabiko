@@ -1,0 +1,22 @@
+// Markdown lint for the public documentation. Run from the repo root:
+//   npx markdownlint-cli2 --config .github/.markdownlint-cli2.jsonc
+{
+  "config": {
+    "default": true,
+    // Prose is wrapped by hand in some files and not at all in others.
+    "MD013": false,
+    // The README header is centered HTML, not a Markdown heading.
+    "MD041": false,
+    "MD033": {
+      "allowed_elements": ["p", "a", "img", "picture", "source", "details", "summary", "b", "i", "br", "kbd"]
+    },
+    // Keep a Changelog repeats "Added", "Changed" and "Fixed" under every release.
+    "MD024": { "siblings_only": true },
+    "MD060": false
+  },
+  "globs": [
+    "*.md",
+    ".github/**/*.md",
+    "docs/**/*.md"
+  ]
+}

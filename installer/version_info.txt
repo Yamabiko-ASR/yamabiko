@@ -1,0 +1,48 @@
+# PyInstaller VERSIONINFO resource for yamabiko.exe (release item A4).
+# Embeds Windows file/product version + publisher metadata in the PE so the
+# exe is not "no information" in Properties -> Details, which (together with
+# the NSIS VIAddVersionKey block in yamabiko.nsi) reduces SmartScreen friction
+# on the as-yet-unsigned build. Wired in via installer/yamabiko.spec EXE(version=).
+#
+# Binary version fields must be 4 numeric parts; the "-beta" pre-release suffix
+# lives only in the string FileVersion/ProductVersion. ASCII only -- the
+# resource is embedded as UTF-16 by PyInstaller and non-ASCII here has tripped
+# builds before.
+#
+# On a version bump, update filevers/prodvers AND the FileVersion/
+# ProductVersion strings together with yamabiko.nsi's APP_VERSION /
+# APP_VERSION_QUAD -- scripts/preflight.py's version-consistency section
+# fails the release gate if any of them drift.
+#
+# FileDescription is the bare app name: with no AUMID, Windows shows it as the
+# notification header and the sender name in Settings > Notifications.
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(0, 2, 0, 0),
+    prodvers=(0, 2, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable(
+        '040904B0',
+        [
+          StringStruct('CompanyName', 'Christian Allen'),
+          StringStruct('FileDescription', 'Yamabiko'),
+          StringStruct('FileVersion', '0.2.0-beta'),
+          StringStruct('InternalName', 'yamabiko'),
+          StringStruct('LegalCopyright', '(c) Christian Allen. PolyForm Noncommercial 1.0.0.'),
+          StringStruct('OriginalFilename', 'yamabiko.exe'),
+          StringStruct('ProductName', 'Yamabiko'),
+          StringStruct('ProductVersion', '0.2.0-beta')
+        ]
+      )
+    ]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)

@@ -1,0 +1,303 @@
+# Time-stable seed glossary — ships with the app, read-only.
+#
+# Priority order in GlossaryManager: user.yaml > genre.json > _seed.yaml.
+# Any user-learned entry for the same surface overrides this file.
+#
+# Policy: entries here must be TIME-STABLE — place names, country exonyms,
+# long-standing institutions, fixed cultural fixtures. NO current political
+# figures, athletes, celebrities, or current-event names. Those rot fast
+# and are better handled by the learning path (per-genre JSON).
+#
+# Romanization: Hepburn with macrons (BGN/PCGN 2024). Tōkyō not Tokyo.
+# Readings: hiragana only, as with user.yaml.
+version: 1
+entries:
+  # ---- All 47 prefectures, plain form (most commonly said) ----
+  北海道:
+    en: Hokkaidō
+    reading: ほっかいどう
+  青森:
+    en: Aomori
+    reading: あおもり
+  岩手:
+    en: Iwate
+    reading: いわて
+  宮城:
+    en: Miyagi
+    reading: みやぎ
+  秋田:
+    en: Akita
+    reading: あきた
+  山形:
+    en: Yamagata
+    reading: やまがた
+  福島:
+    en: Fukushima
+    reading: ふくしま
+  茨城:
+    en: Ibaraki
+    reading: いばらき
+  栃木:
+    en: Tochigi
+    reading: とちぎ
+  群馬:
+    en: Gunma
+    reading: ぐんま
+  埼玉:
+    en: Saitama
+    reading: さいたま
+  千葉:
+    en: Chiba
+    reading: ちば
+  東京:
+    en: Tōkyō
+    reading: とうきょう
+  東京都:
+    en: Tōkyō
+    reading: とうきょうと
+  神奈川:
+    en: Kanagawa
+    reading: かながわ
+  新潟:
+    en: Niigata
+    reading: にいがた
+  富山:
+    en: Toyama
+    reading: とやま
+  石川:
+    en: Ishikawa
+    reading: いしかわ
+  福井:
+    en: Fukui
+    reading: ふくい
+  山梨:
+    en: Yamanashi
+    reading: やまなし
+  長野:
+    en: Nagano
+    reading: ながの
+  岐阜:
+    en: Gifu
+    reading: ぎふ
+  静岡:
+    en: Shizuoka
+    reading: しずおか
+  愛知:
+    en: Aichi
+    reading: あいち
+  三重:
+    en: Mie
+    reading: みえ
+  滋賀:
+    en: Shiga
+    reading: しが
+  京都:
+    en: Kyōto
+    reading: きょうと
+  京都府:
+    en: Kyōto
+    reading: きょうとふ
+  大阪:
+    en: Ōsaka
+    reading: おおさか
+  大阪府:
+    en: Ōsaka
+    reading: おおさかふ
+  兵庫:
+    en: Hyōgo
+    reading: ひょうご
+  奈良:
+    en: Nara
+    reading: なら
+  和歌山:
+    en: Wakayama
+    reading: わかやま
+  鳥取:
+    en: Tottori
+    reading: とっとり
+  島根:
+    en: Shimane
+    reading: しまね
+  岡山:
+    en: Okayama
+    reading: おかやま
+  広島:
+    en: Hiroshima
+    reading: ひろしま
+  山口:
+    en: Yamaguchi
+    reading: やまぐち
+  徳島:
+    en: Tokushima
+    reading: とくしま
+  香川:
+    en: Kagawa
+    reading: かがわ
+  愛媛:
+    en: Ehime
+    reading: えひめ
+  高知:
+    en: Kōchi
+    reading: こうち
+  福岡:
+    en: Fukuoka
+    reading: ふくおか
+  佐賀:
+    en: Saga
+    reading: さが
+  長崎:
+    en: Nagasaki
+    reading: ながさき
+  熊本:
+    en: Kumamoto
+    reading: くまもと
+  大分:
+    en: Ōita
+    reading: おおいた
+  宮崎:
+    en: Miyazaki
+    reading: みやざき
+  鹿児島:
+    en: Kagoshima
+    reading: かごしま
+  沖縄:
+    en: Okinawa
+    reading: おきなわ
+
+  # ---- Major cities not covered by prefecture entries ----
+  札幌:
+    en: Sapporo
+    reading: さっぽろ
+  仙台:
+    en: Sendai
+    reading: せんだい
+  横浜:
+    en: Yokohama
+    reading: よこはま
+  川崎:
+    en: Kawasaki
+    reading: かわさき
+  名古屋:
+    en: Nagoya
+    reading: なごや
+  神戸:
+    en: Kōbe
+    reading: こうべ
+  北九州:
+    en: Kitakyūshū
+    reading: きたきゅうしゅう
+
+  # ---- Countries commonly said in JP news ----
+  # 日本 is also in _denylist.txt, so this entry's `en:` is unreachable
+  # for prompt hints (extraction drops the surface before lookup).
+  # KEPT for the furigana path: build_ruby consults the glossary for
+  # every kanji span without the denylist, and this curated reading
+  # にほん outranks the tagger's にっぽん.
+  # tests/test_romanization_pipeline.py pins this as the ONLY allowed
+  # seed/denylist overlap.
+  日本:
+    en: Japan
+    reading: にほん
+  中国:
+    en: China
+    reading: ちゅうごく
+  韓国:
+    en: Korea
+    reading: かんこく
+  北朝鮮:
+    en: North Korea
+    reading: きたちょうせん
+  台湾:
+    en: Taiwan
+    reading: たいわん
+  アメリカ:
+    en: America
+    reading: あめりか
+  米国:
+    en: USA
+    reading: べいこく
+  英国:
+    en: UK
+    reading: えいこく
+  フランス:
+    en: France
+    reading: ふらんす
+  ドイツ:
+    en: Germany
+    reading: どいつ
+  ロシア:
+    en: Russia
+    reading: ろしあ
+  欧州:
+    en: Europe
+    reading: おうしゅう
+  インド:
+    en: India
+    reading: いんど
+  豪州:
+    en: Australia
+    reading: ごうしゅう
+  カナダ:
+    en: Canada
+    reading: かなだ
+
+  # ---- Long-standing institutions ----
+  国会:
+    en: National Diet
+    reading: こっかい
+  首相官邸:
+    en: Prime Minister's Office
+    reading: しゅしょうかんてい
+  財務省:
+    en: Finance Ministry
+    reading: ざいむしょう
+  外務省:
+    en: Foreign Ministry
+    reading: がいむしょう
+  経産省:
+    en: METI
+    reading: けいさんしょう
+  防衛省:
+    en: Defense Ministry
+    reading: ぼうえいしょう
+  厚労省:
+    en: Health Ministry
+    reading: こうろうしょう
+  日銀:
+    en: Bank of Japan
+    reading: にちぎん
+  自衛隊:
+    en: Self-Defense Forces
+    reading: じえいたい
+  自民党:
+    en: LDP
+    reading: じみんとう
+  立憲民主党:
+    en: CDP
+    reading: りっけんみんしゅとう
+  公明党:
+    en: Kōmeitō
+    reading: こうめいとう
+  共産党:
+    en: Communist Party
+    reading: きょうさんとう
+  NHK:
+    en: NHK
+    reading: えぬえいちけい
+
+  # ---- Fixed cultural / geographic fixtures ----
+  富士山:
+    en: Mt. Fuji
+    reading: ふじさん
+  琵琶湖:
+    en: Lake Biwa
+    reading: びわこ
+  本州:
+    en: Honshū
+    reading: ほんしゅう
+  九州:
+    en: Kyūshū
+    reading: きゅうしゅう
+  四国:
+    en: Shikoku
+    reading: しこく

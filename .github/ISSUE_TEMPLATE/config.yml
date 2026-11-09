@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Help and support
+    url: https://github.com/Yamabiko-ASR/yamabiko#contact
+    about: Setup, troubleshooting, and ordinary usage questions.
+  - name: Troubleshooting guide
+    url: https://github.com/Yamabiko-ASR/yamabiko#fix-common-problems
+    about: Common fixes (no subtitles, port conflicts, relaunch refusals) before filing a bug.

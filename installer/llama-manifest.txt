@@ -1,0 +1,52 @@
+# Vendored llama.cpp file set -- the single source of truth for what
+# llama-server.exe needs at runtime. Shared by:
+#   * installer/build.ps1            (assert present + copy into bundle)
+#   * installer/rebuild-fast.ps1     (assert present + copy into bundle)
+#   * installer/ci-prepare-vendor-stubs.ps1 (create stubs for CI)
+#   * scripts/preflight.py           (bundle-side closure check)
+#
+# WHY: audit_bundle_dlls.py deliberately skips the _internal/llama
+# subtree, so without this manifest a re-vendor that forgets a CUDA/ggml
+# sidecar DLL ships silently and the translator dies at startup on the
+# user's machine.
+#
+# MUST match the CUDA version of the vendored binary recorded in
+# third_party/llama.cpp/COMMIT.txt. The current vendored
+# llama-server is built on CUDA 12.9, so the
+# runtime DLLs below are the *_12 family; a future CUDA-major re-vendor
+# renames them here in lockstep -- this file is the one place that
+# needs editing.
+#
+# Format: one filename per line; '#' comments and blank lines ignored.
+#
+# LICENSE.txt is llama.cpp's MIT license. It is listed here (rather than left
+# in third_party/ only) because MIT requires the copyright and permission
+# notice accompany the BINARY distribution -- shipping llama-server.exe and its
+# DLLs without it is a license violation. Listing it here means every existing
+# guard carries it for free: build.ps1 + rebuild-fast.ps1 copy it into
+# _internal/llama/ and preflight section 14 asserts it is present.
+LICENSE.txt
+llama-server.exe
+cublas64_12.dll
+cublasLt64_12.dll
+cudart64_12.dll
+ggml-base.dll
+ggml-cpu.dll
+ggml-cuda.dll
+ggml.dll
+llama.dll
+mtmd.dll
+# MSVC C/C++ runtime + OpenMP redistributables. The vendored llama-server
+# binaries statically import these (verified via PE import table). They are
+# NOT present in a clean Windows install -- only on a box that already has
+# the VC++ redistributable -- so llama-server fails to start for users who
+# lack it unless we ship them. These four are AUTO-SOURCED from the build
+# host's installed VS redist by installer/vendor-vcredist.ps1, which build.ps1
+# + rebuild-fast.ps1 run before this manifest is asserted -- no manual copy
+# needed on a re-vendor. (If that helper's set changes, keep it in lockstep:
+# tests/test_vendor_vcredist.py asserts the helper sources exactly this
+# subset.)
+msvcp140.dll
+vcruntime140.dll
+vcruntime140_1.dll
+vcomp140.dll

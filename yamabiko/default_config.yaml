@@ -1,0 +1,369 @@
+audio:
+  device: default
+  # FIXED at 16000 by Yamabiko's Silero wrapper contract (512-sample
+  # external frames at 16 kHz; the wrapper prepends 64 context samples,
+  # so the raw ONNX graph receives 576; see vad/silero_chunker.py).
+  # Do not override:
+  # build_pipeline forces 16000 with a WARNING if this is set to
+  # anything else. The capture layer resamples device audio to
+  # this rate, so 16000 is always safe.
+  sample_rate: 16000
+  block_ms: 30
+  # Seconds of sustained sub-floor (silent) audio, AFTER audio was flowing,
+  # before the capture re-opens its stream IN PLACE to re-attach the endpoint
+  # (issue #54: a pinned device that suspends, or whose render session moves,
+  # mid-session). The discriminator is audible energy, not frame arrival, and
+  # the action is an in-place re-open, NOT a process restart. Consumed by
+  # build_pipeline -> AudioConfig.idle_death_s -> the capture monitor.
+  idle_death_s: 90
+vad:
+  # No ``enabled`` toggle: SileroChunker is load-bearing for the whole
+  # pipeline — downstream stages (fast-bunkai, translator)
+  # all expect VAD-gated speech chunks, not raw audio. A disable path
+  # would need a parallel pass-through chunker that doesn't exist yet.
+  # If you want to experiment without VAD, edit main.py directly.
+  # Every probability below is Silero's raised by the bundled sound
+  # tagger, max(silero, min(1, 1.5 * (voice + shout))) per frame
+  # (vad/sound_tagger.py). The tagger has no keys: its weight, classes
+  # and 0.24 s look-ahead are the configuration the ASR bench measured.
+  # 0.3, not Silero's generic 0.5: produced media (anime, drama) mixes
+  # dialogue under music/SFX beds that depress the speech probability.
+  # At 0.5 a full real episode measured 81.3% speech coverage with whole
+  # reaction lines silently skipped; 0.3 (+ the gate's built-in
+  # sustain-hysteresis at threshold-0.15) measured 90.8% with a 2%
+  # junk-chunk rate and no clean-audio regression (scripts/vad_lab.py,
+  # 2026-07-02). Raise toward 0.5 only for clean-speech-only sources.
+  threshold: 0.3
+  # min_silence_ms 400 and min_chunk_ms 500 (from 500 and 1000), with the
+  # tagger's 0.24 s look-ahead, brought lines out 0.45 s sooner on average
+  # on the ASR bench's anime set, with no quality change it could tell
+  # from zero (recall, interjections, CER, uncued lines).
+  min_silence_ms: 400
+  speech_pad_ms: 200
+  min_chunk_ms: 500
+  max_chunk_ms: 8000
+  # Cap glue across trailing silence for a sub-min-chunk utterance.
+  glue_max_silence_ms: 1500
+  # Attach-don't-extend: audio between chunks is buffered and attached
+  # to the next chunk so the ASR hears it (the VAD segments, it does not
+  # filter). Only audio that sat below drop_floor_prob for drop_floor_ms
+  # straight is discarded. attach_max_ms bounds the buffer (memory and
+  # worst-case chunk length).
+  attach_max_ms: 6000
+  drop_floor_prob: 0.10
+  drop_floor_ms: 2000
+  # Dip-splitter: a rapid back-and-forth exchange has no pause between
+  # turns, so the gate never closes and both speakers land in one
+  # subtitle. Silero's per-frame probability still dips at each turn
+  # boundary; when a dip recovers, cut the open chunk at the dip's lowest
+  # frame so the turns become separate lines. Only cuts once the left
+  # piece is at least dip_split_min_piece_ms long. Consumed by
+  # build_pipeline -> ChunkerConfig -> FrameGate.
+  #
+  # OFF by default: at the initial thresholds it regressed overall
+  # subtitle quality on a blind full-distribution A/B (it fires on far
+  # more than its burst-exchange target, cutting inside single sentences).
+  # Burst-heavy content may still benefit from enabling it by hand; leave
+  # it off until a retune passes a same-batch full-distribution
+  # non-regression gate. true is byte-identical to the tuned splitter;
+  # false is byte-identical to the old gate.
+  dip_split_enabled: false
+  dip_split_threshold: 0.15
+  dip_split_min_piece_ms: 1000
+asr:
+  # Silence (ms) prepended AND appended to every clip before it reaches
+  # faster-whisper. Whisper models truncate the first/last syllables of SHORT
+  # clips -- a documented boundary artifact whose community fix is a little
+  # leading + trailing silence. Measured 2026-07-05 on kotoba-whisper (the
+  # default model then) on real episodes vs JA CC ground truth (3 titles, 1530
+  # chunks): chunk-CER 47.70->46.20 (digimon), 30.56->27.34 (turn-a),
+  # 32.03->30.01 (chainsaw); median latency unchanged, junk-gate empties
+  # unchanged. Kept at the same value for the current model, which was
+  # benchmarked with it. The added silence raises the window-level
+  # no_speech_prob. The paired junk gate also needs a low avg_logprob
+  # (text-derived, so unmoved by silence); the no-speech-only gate
+  # (faster_whisper.no_speech_only_threshold) does not, so re-check that
+  # threshold before changing this. Set 0 to disable (byte-identical to no
+  # padding). Consumed by build_asr -> FasterWhisperASR.transcribe.
+  boundary_pad_ms: 500
+  incremental:
+    # Faster subtitles (Settings > Timing). true: while a speech window is
+    # still open, the ASR stage decodes it as it grows and sends each sentence
+    # on as soon as two decodes agree on it (yamabiko/asr/incremental.py).
+    # false: every sentence waits for its window to close, exactly as before.
+    # Consumers: build_pipeline seeds AppState from it; the ASR stage reads
+    # AppState at each new window; the Settings switch writes it.
+    enabled: true
+  faster_whisper:
+    # Japanese CT2 model: Kodama-1, Yamabiko's own fine-tune of
+    # efwkjn/whisper-ja-760M (CC BY-SA 4.0; see NOTICE). This app only ever
+    # transcribes Japanese. Its pruned vocabulary needs ctranslate2 >= 4.7.1.
+    # Run it with initial_prompt "" and no_speech_only_threshold 0.95 (below),
+    # as its model card says. Pin lives in yamabiko/models.py (WHISPER_REPO)
+    # -- this string mirrors it.
+    model: Yamabiko-ASR/kodama-1
+    # float16 by default. Pure int8 crashes CT2 on Blackwell (sm_120) per
+    # CUBLAS_STATUS_NOT_SUPPORTED — so do NOT use compute_type=int8 there.
+    # int8_float16 uses INT8 weights with FP16 compute (different GEMM kernel)
+    # and IS safe on all sm_70+ including Blackwell, so the wizard automatically
+    # picks it for tier-small users via translation.quant_tier=small.
+    # Do NOT assume tier-small means pre-Blackwell: the 8 GB RTX 5060 / 5060 Ti
+    # are sm_120 and land in this tier. Verified on the shipping stack rather
+    # than assumed -- ctranslate2 4.8.3 `get_supported_compute_types("cuda")`
+    # on an sm_120 card returns int8_float16 (and int8) as supported.
+    compute_type: float16
+    device: cuda
+    # Whisper decode beam width. 5 is faster-whisper's default. Greedy (1) is
+    # faster but on short clips commits to the single most-frequent token, so a
+    # casual word gets misheard as a more common one (悪い "my bad" -> 終わり
+    # "it's over"); a beam keeps rival hypotheses alive so the correct word can
+    # win. Raise for accuracy, lower (1) for minimum latency. Consumed by
+    # build_asr -> FasterWhisperASR.
+    beam_size: 5
+    # Decoder prompt. Empty: Kodama-1 is decoded with no prompt, as it was
+    # trained and accepted ("" reaches faster-whisper as None). A model that
+    # needs help with sentence-final punctuation can take a short
+    # register-neutral prime instead; the previous default model ran with
+    # "うん、そうだね。えっ、本当に？やった、よかった！はい、わかりました。".
+    # Consumed by build_asr -> FasterWhisperASR.
+    initial_prompt: ""
+    # Drop a segment on no_speech_prob alone above this value, before the
+    # paired no_speech/avg_logprob gate. Kodama-1 marks non-speech with
+    # no_speech_prob near 0.99 but can still write confident text there,
+    # which the paired gate keeps; 0.95 is the value it was accepted with.
+    # 1.0 turns the gate off (no probability is above 1.0); null is not
+    # accepted here, because the shipped value is a number. Set 1.0, together
+    # with model and initial_prompt, for a model not trained on no-speech
+    # windows. Consumed by build_asr -> FasterWhisperASR.
+    no_speech_only_threshold: 0.95
+translation:
+  endpoint: http://localhost:8090/v1/chat/completions
+  # Must equal yamabiko.models.TRANSLATOR_ALIAS -- watchdog spawns
+  # llama-server with `--alias TRANSLATOR_ALIAS` and this is the model name
+  # every chat request addresses (mismatch = 404 on every translation).
+  # Covered by a producer/consumer test in tests/test_model_constants.py.
+  model: qwen3.5-9b
+  max_tokens: 80
+  temperature: 0.1
+  # llama-server is spawned concurrently with the pipeline and may still
+  # be loading the multi-GB GGUF (it returns HTTP 503 "loading model") when
+  # build_pipeline runs. Translator.wait_until_ready polls /health up to this
+  # many seconds before declaring a real failure, so a cold load no longer
+  # trips a spurious exit-43 STOP_ALL ("Translation service didn't start").
+  startup_readiness_timeout_s: 90.0
+  startup_readiness_poll_s: 2.0
+  context_lines: 2
+  # 10GB+ cards (RTX 4070+/5070+) run the default tier (Qwen3.5-9B
+  # UD-Q3_K_XL, ~5.1 GB). 8GB cards should pick `small` (~4 GB; see
+  # yamabiko.models.TRANSLATOR_PINS for the per-tier repo/file pins). Set
+  # via setup's Quality step (QuantTierPage) or
+  # the overlay Settings row; this YAML default is the fallback when
+  # neither was used.
+  quant_tier: default  # default | small
+  # Negation-preservation guard. After a translation returns, a fugashi/UniDic
+  # check compares JP and EN polarity. If the Japanese final predicate is
+  # clearly negated but the English dropped the negation, or the English added
+  # an imperative "Don't" the Japanese never asked for, the translator makes ONE
+  # extra llama call asking it to fix the polarity, and keeps the retry only if
+  # the negation flips the right way (otherwise the original is kept). Polarity
+  # inversions are the most dangerous error class -- they silently reverse
+  # meaning. Conservative by design: rhetorical じゃないか and prohibitive 行くな
+  # never fire. Requires a running translator; adds at most one extra call per
+  # affected line. Consumed by yamabiko.main.build_pipeline ->
+  # TranslationConfig.polarity_guard.
+  polarity_guard: true
+  # Series-context prompt hint. When true AND a series is active (palette
+  # pick / boot restore) AND its cached profile exists
+  # (gazetteers/profile-<media_id>.json), every translation prompt carries
+  # one "Series: <tags; synopsis>" line composed by
+  # yamabiko.gazetteer.series_profile.context_hint. OFF by default: the
+  # default flips only on a blind judged A/B win over the bench corpus.
+  # Consumed by yamabiko.main.build_pipeline -> translation_stage
+  # (series_hint_enabled).
+  series_context_hint: false
+overlay:
+  # Serve the browser overlay PAGE at http://127.0.0.1:<port>/ (for
+  # OBS browser sources etc.). The WS/health server itself always
+  # runs — the Qt desktop overlay, tray commands, and watchdog
+  # probes depend on it — so `false` only drops the browser page
+  # routes. Consumer: run_pipeline -> build_app(serve_browser_ui=).
+  browser: true
+  websocket_port: 8765
+  style:
+    # Subtitle look ("Telop, echoing"). Sizes are points (1 pt = 4/3 px):
+    # the defaults give 21 px Japanese and 31 px English at 100% scale.
+    # Consumers: overlay_app.telop_look.look_from_style (Qt overlay and
+    # Settings preview), display/static/overlay.js applyStyle (browser).
+    jp_font: BIZ UDPGothic
+    jp_size: 16
+    en_font: Bahnschrift
+    en_size: 23
+    # English on the dark bar and the echo text.
+    text_color: '#ffffff'
+    # The dark bar behind the newest English line.
+    bg_color: '#0e1014'
+    bg_opacity: 237
+    # Scales the strip and bar padding (10 = the approved design).
+    padding: 10
+    # Subtitle stack max width, % of the overlay's monitor width. Text
+    # wraps at the cap.
+    max_width_pct: 70
+    # Lines on screen: the newest plus the echo.
+    max_lines: 3
+    hold_ms: 5000
+    fade_in_ms: 160
+    fade_out_ms: 420
+    # watch (English priority) or learn (Japanese priority).
+    mode: watch
+    # left: the stack's left edge is the anchor; center: centered on it.
+    alignment: left
+    # Which language older lines keep: priority (English in Watch,
+    # Japanese in Learn) or both.
+    echo: priority
+    # Banner text: jp, or jp_en (Japanese plus English set sideways).
+    banner: jp
+  # Chrome theme for settings/palette/tray: system follows the Windows
+  # light/dark app setting; light/dark force. Consumer:
+  # overlay_app.theme.resolve_mode.
+  theme: system
+  # Reduce motion: the subtitle overlay (Qt and browser page) switches
+  # lines and plates instantly. Consumers:
+  # overlay_window.OverlayWindow.set_reduce_motion (boot and Settings
+  # Apply), state.AppState.style_frame -> overlay.js, and settings_window
+  # (the Reduce motion switch).
+  reduce_motion: false
+  # Anchor-model position (replaces the legacy free geometry rect).
+  # Consumers: overlay_window.OverlayWindow._reposition_stack,
+  # overlay_app placement mode, tray Position presets.
+  position:
+    screen: primary        # 'primary' or a QScreen name
+    v_offset_pct: 88.0     # stack BOTTOM edge, % of screen height from top
+    h_offset_pct: 50.0     # Center alignment: stack center, % of screen width
+    left_offset_pct: 6.0   # Left alignment: stack LEFT edge, % of screen width
+  # LEGACY free-geometry rect, retired in favour of the anchor `position`
+  # block above. Kept as a null shipped default for two reasons: the
+  # one-time migration in overlay_app.__main__ reads a user's saved
+  # overlay.geometry (from an older install), maps it to the anchor model,
+  # then prunes it via config_writer.write_overlay_position; and the
+  # unknown-key config walker needs the key present so a saved geometry
+  # dict isn't stripped before migration runs. Consumer:
+  # config.load_overlay_config -> OverlayConfig.geometry.
+  geometry: null
+romanization:
+  enabled: true
+  # Empty string = use the user-writable default
+  # paths.app_data_dir()/glossaries, seeded from the bundle on first run
+  # (learned proper-nouns must survive upgrades).
+  # Set this to an ABSOLUTE path if you want glossaries to live
+  # elsewhere; a relative path is ignored (cwd differs between dev and
+  # the installed app, so it is ambiguous) and falls back to that
+  # default (see yamabiko.main.build_pipeline).
+  #
+  # Why "" rather than omitting the key entirely: the config validator
+  # strips unknown-to-defaults keys from overrides, so a
+  # user-supplied `glossaries_dir: "..."` would silently vanish if the
+  # key weren't in shipped defaults.
+  glossaries_dir: ""
+gazetteer:
+  # Per-series proper-noun gazetteer: maps JA character names (from
+  # AniList) to AniList's romanized names, used as SOFT
+  # prompt-hints by RomanizationPipeline (never source substitution).
+  # Consumed by yamabiko.main.build_pipeline's boot-restore, which
+  # restores the cached gazetteer for whichever series
+  # active_series.json points at.
+  #
+  # Requires romanization.enabled: true as well. A series hint can only
+  # reach the model through RomanizationPipeline, so gazetteer.enabled with
+  # romanization.enabled false is a silent no-op. The effective on-switch
+  # (gazetteer.feature_enabled, both flags) is what every entry point gates
+  # on: the hotkey bind, the palette / tray UI, boot restore, and the
+  # set_series wire command.
+  #
+  # The palette hotkey now lives in hotkeys.show_series.
+  enabled: true
+  # Fuzzy katakana matching (v1.5). The ASR model garbles name surfaces
+  # (ライラン for ライラモン), so the exact-only lookup misses most lines.
+  # When true, RomanizationPipeline.process_pre tries a strict fuzzy match
+  # on the active gazetteer AFTER the exact gazetteer and shipped-seed
+  # lookups, and only for proper nouns. Consumed by
+  # yamabiko.main.build_pipeline (passed to RomanizationPipeline).
+  # Deliberately strict: a wrong-name hint is worse than none.
+  fuzzy_enabled: true
+  # Accept bar for a fuzzy match: normalized Levenshtein (edits / folded key
+  # length) must be <= this. 0.25 lets a longer name absorb one garbled mora
+  # while a short 3-mora name still needs an exact fold (any single edit is
+  # 0.333). Raising it starts matching common loanwords onto names.
+  fuzzy_max_distance: 0.25
+  # On a series pick in the palette, also switch genre to "anime" (the
+  # palette is AniList, which is anime-only). Manual genre changes stick
+  # until the next pick; boot restore never touches genre. Consumed by
+  # overlay_app.__main__'s build_overlay (threaded into the Tray) and
+  # toggleable via the overlay settings window.
+  auto_genre: true
+  # AniList username for the series palette's "Currently watching"
+  # section. Empty string = section off (the shipped state). Consumers:
+  # the overlay settings window's "AniList username" field
+  # (settings_window seeds from and persists this key) and
+  # overlay_app.series_palette, which re-reads it at every palette open
+  # to fetch the user's current list (AniListClient.fetch_watching).
+  # Present in shipped defaults so the config validator doesn't strip a
+  # user override (romanization.glossaries_dir reasoning).
+  anilist_username: ""
+genre: variety
+hotkeys:
+  enabled: true
+  pause_resume: Ctrl+Alt+P
+  toggle_overlay: Ctrl+Alt+O
+  # Summons the series-search palette. Consumed by HotkeyManager.register
+  # (pipeline-owned hook -> PipelineApp.handle_show_series_hotkey ->
+  # broadcast show_series_palette to the overlay).
+  show_series: Ctrl+Alt+S
+updates:
+  check_on_startup: true  # ping GitHub Releases on launch to check for new versions
+logging:
+  level: INFO
+  latency_log_enabled: true   # set false to disable per-segment latency.log
+  # When true, each latency.log record also carries the raw "jp" (ASR text)
+  # and "en" (translation) for that segment, and the overlay's
+  # overlay.subtitle.rendered sentinel carries the raw "en". OFF by default:
+  # it writes user speech transcripts to disk, so it's opt-in for accuracy
+  # debugging only. Lets you tell an ASR mishearing (jp wrong) from a
+  # translation error (jp right, en wrong) from the log alone. Consumed by
+  # run_pipeline() and build_overlay() (-> OverlayWindow.add_subtitle).
+  transcript_log_enabled: false
+lifecycle:
+  # Watchdog HealthProbe knobs. The probe only arms its fail budget
+  # AFTER the first 200 OK from the pipeline's /livez endpoint, so
+  # a cold-boot pipeline (pre-uvicorn-bind) never false-trips. Once
+  # armed, after fail_budget_s of continuous failure the probe
+  # force-restarts the hung pipeline. Consumed by
+  # run_watchdog() in yamabiko/watchdog.py.
+  health:
+    poll_interval_s: 5.0
+    fail_budget_s: 120.0
+  grace_s:
+    # Seconds the watchdog waits for a child's graceful finally to
+    # complete before falling back to terminate. The named-event
+    # signal is fired BEFORE stop_event is set (see run_watchdog's
+    # _on_signal), so the child sees the shutdown ping as soon as
+    # the signal handler runs; this window is how long it gets to
+    # unwind before hard termination. Consumers:
+    #   - lifecycle.grace_s.pipeline -> Watchdog._wait_or_stop via
+    #     build_watchdog (wires to wd_pipeline's Watchdog ctor).
+    #   - lifecycle.grace_s.overlay  -> PipelineSupervisor via
+    #     yamabiko.main.run_pipeline's overlay supervisor ctor.
+    pipeline: 10.0
+    overlay: 3.0
+  overlay:
+    # Overlay supervisor anti-flap. The PipelineSupervisor
+    # restarts the overlay process if it exits -- whether by natural
+    # crash, external kill (e.g. user ends overlay via Task Manager),
+    # or a spawn-time exception. Without a cap, a user fighting the
+    # overlay via kill-repeat produces an infinite respawn loop that
+    # burns CPU + file handles. If more than max_restarts restarts
+    # happen inside restart_window_s, the supervisor gives up and
+    # trips the pipeline's stop_event so everything shuts down
+    # cleanly. Consumer: PipelineSupervisor ctor in
+    # yamabiko.main.run_pipeline.
+    max_restarts: 3
+    restart_window_s: 60.0

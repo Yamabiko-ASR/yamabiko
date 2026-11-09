@@ -1,0 +1,67 @@
+name: Bug report
+description: Something broke (crash, no subtitles, wrong output, install trouble).
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+      placeholder: Subtitles stopped appearing after ~10 minutes; the tray icon was still there.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Launch Yamabiko
+        2. Play a Japanese stream in the browser
+        3. Pause the video for 20 minutes, resume
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Yamabiko version
+      description: >
+        Windows Settings > Apps > Installed apps lists it under Yamabiko,
+        and it is in the installer's file name
+        (`yamabiko-<version>-setup.exe`). In a log file, search for the
+        LAST `yamabiko <role> v...` banner line (logs append across runs,
+        so the most recent banner is the run that broke).
+      placeholder: v0.2.0-beta
+    validations:
+      required: true
+  - type: input
+    id: gpu
+    attributes:
+      label: GPU and driver version
+      description: Run `nvidia-smi` in a terminal; the header shows both.
+      placeholder: RTX 4070, driver 576.02
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2
+    validations:
+      required: false
+  - type: checkboxes
+    id: log
+    attributes:
+      label: Log file
+      description: >
+        Easiest: left-click the tray icon, choose Troubleshooting > Save
+        diagnostics, and drag the `yamabiko-diagnostics-*.zip` it saves to
+        your Desktop into the text area above. It bundles every log plus a
+        settings snapshot (setting names only, never their values). Prefer
+        to attach by hand? Use the `main-*.log` files from
+        `%LOCALAPPDATA%\Yamabiko\logs\`
+        (one log per process: watchdog, pipeline, overlay). Logs contain no
+        audio and no transcript content, unless you enabled transcript
+        logging in the config.
+      options:
+        - label: I attached the diagnostics zip or the main-*.log files, or explained above why I can't.
+          required: true

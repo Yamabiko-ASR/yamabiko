@@ -1,0 +1,156 @@
+schema_version = 1
+
+[[component]]
+id = "nvidia-cublas-cu12-sidecars"
+name = "NVIDIA cuBLAS 12 runtime sidecars"
+class = "nvidia-runtime"
+priority = 300
+globs = [
+  "_internal/llama/cublas64_12.dll",
+  "_internal/llama/cublasLt64_12.dll",
+]
+license_mode = "distribution"
+license_source = "nvidia-cublas-cu12"
+
+[[component]]
+id = "nvidia-cuda-runtime-cu12-sidecar"
+name = "NVIDIA CUDA 12 runtime sidecar"
+class = "nvidia-runtime"
+priority = 300
+globs = ["_internal/llama/cudart64_12.dll"]
+license_mode = "distribution"
+license_source = "nvidia-cuda-nvrtc-cu12"
+
+[[component]]
+id = "microsoft-vc-runtime"
+name = "Microsoft Visual C++ Runtime"
+class = "vc-runtime"
+priority = 200
+globs = [
+  "_internal/msvcp140*.dll",
+  "_internal/vcruntime140*.dll",
+  "_internal/vcomp140.dll",
+  "_internal/llama/msvcp140*.dll",
+  "_internal/llama/vcruntime140*.dll",
+  "_internal/llama/vcomp140.dll",
+]
+license_mode = "reviewed-exception"
+review_id = "VC-REDIST-EULA"
+review_reason = "Microsoft Visual C++ runtime DLLs are redistributed under the Microsoft Visual C++ Redistributable terms; the reviewed terms do not require a separate license-text payload."
+
+[[component]]
+id = "llama-cpp"
+name = "llama.cpp"
+class = "vendored"
+priority = 100
+# Keep this synchronized with installer/llama-manifest.txt.  This is
+# intentionally exact rather than a catchall: a new sidecar must acquire a
+# reviewed owner instead of silently inheriting llama.cpp's MIT license.
+globs = [
+  "_internal/llama/LICENSE.txt",
+  "_internal/llama/llama-server.exe",
+  "_internal/llama/cublas64_12.dll",
+  "_internal/llama/cublasLt64_12.dll",
+  "_internal/llama/cudart64_12.dll",
+  "_internal/llama/ggml-base.dll",
+  "_internal/llama/ggml-cpu.dll",
+  "_internal/llama/ggml-cuda.dll",
+  "_internal/llama/ggml.dll",
+  "_internal/llama/llama.dll",
+  "_internal/llama/msvcp140.dll",
+  "_internal/llama/mtmd.dll",
+  "_internal/llama/vcomp140.dll",
+  "_internal/llama/vcruntime140_1.dll",
+  "_internal/llama/vcruntime140.dll",
+]
+license_mode = "bundle-file"
+license_source = "_internal/llama/LICENSE.txt"
+
+[[component]]
+id = "efficientsed-sound-tagger"
+name = "EfficientSED sound tagger (ONNX export)"
+class = "vendored"
+priority = 100
+# Exact files, so a new data file under vad/data needs its own reviewed owner.
+globs = [
+  "_internal/yamabiko/vad/data/efficientsed-fmn10-tf256-kd.onnx",
+  "_internal/yamabiko/vad/data/LICENSE-EfficientSED.txt",
+]
+license_mode = "bundle-file"
+license_source = "_internal/yamabiko/vad/data/LICENSE-EfficientSED.txt"
+
+[[component]]
+id = "biz-udpgothic-font"
+name = "BIZ UDPGothic font (SIL OFL 1.1)"
+class = "vendored"
+priority = 100
+# Upstream: https://github.com/googlefonts/morisawa-biz-ud-gothic
+# Exact files, so a new file under static/fonts needs its own reviewed owner.
+globs = [
+  "_internal/yamabiko/display/static/fonts/BIZUDPGothic-Regular.ttf",
+  "_internal/yamabiko/display/static/fonts/BIZUDPGothic-Bold.ttf",
+  "_internal/yamabiko/display/static/fonts/OFL-BIZUDPGothic.txt",
+]
+license_mode = "bundle-file"
+license_source = "_internal/yamabiko/display/static/fonts/OFL-BIZUDPGothic.txt"
+
+[[component]]
+id = "biz-udpmincho-font"
+name = "BIZ UDPMincho font (SIL OFL 1.1)"
+class = "vendored"
+priority = 100
+# Upstream: https://github.com/googlefonts/morisawa-biz-ud-mincho
+# Exact files, so a new file under static/fonts needs its own reviewed owner.
+globs = [
+  "_internal/yamabiko/display/static/fonts/BIZUDPMincho-Regular.ttf",
+  "_internal/yamabiko/display/static/fonts/BIZUDPMincho-Bold.ttf",
+  "_internal/yamabiko/display/static/fonts/OFL-BIZUDPMincho.txt",
+]
+license_mode = "bundle-file"
+license_source = "_internal/yamabiko/display/static/fonts/OFL-BIZUDPMincho.txt"
+
+[[component]]
+id = "klee-one-font"
+name = "Klee One font (SIL OFL 1.1)"
+class = "vendored"
+priority = 100
+# Upstream: https://github.com/fontworks-fonts/Klee
+# Exact files, so a new file under static/fonts needs its own reviewed owner.
+globs = [
+  "_internal/yamabiko/display/static/fonts/KleeOne-SemiBold.ttf",
+  "_internal/yamabiko/display/static/fonts/OFL-KleeOne.txt",
+]
+license_mode = "bundle-file"
+license_source = "_internal/yamabiko/display/static/fonts/OFL-KleeOne.txt"
+
+[[component]]
+id = "settings-preview-photo"
+name = "Settings preview photo (CC BY 2.0)"
+class = "vendored"
+priority = 100
+# "Nakasu Yatai Stalls (19979437930)" by Yoshikazu TAKADA, Wikimedia Commons.
+# Exact files, so a new file under overlay_app/assets needs its own reviewed owner.
+globs = [
+  "_internal/yamabiko/overlay_app/assets/preview-night.jpg",
+  "_internal/yamabiko/overlay_app/assets/LICENSE-preview-night.txt",
+]
+license_mode = "bundle-file"
+license_source = "_internal/yamabiko/overlay_app/assets/LICENSE-preview-night.txt"
+
+[[component]]
+id = "python-runtime"
+name = "Python"
+class = "python-runtime"
+priority = 200
+globs = ["_internal/python3*.dll", "_internal/base_library.zip"]
+license_mode = "python-runtime-file"
+license_source = "python://LICENSE.txt"
+
+[[component]]
+id = "pyinstaller-bootloader"
+name = "PyInstaller bootloader"
+class = "bootloader"
+priority = 200
+globs = ["yamabiko.exe"]
+license_mode = "distribution"
+license_source = "pyinstaller"

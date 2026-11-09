@@ -1,0 +1,55 @@
+{
+ "separators": [
+  {
+   "name": "melband-roformer-big-beta4",
+   "kind": "msst",
+   "sample_rate": 44100,
+   "python": "C:\\absolute\\path\\to\\venv-sep\\Scripts\\python.exe",
+   "model_type": "mel_band_roformer",
+   "config": "C:\\absolute\\path\\to\\config_melbandroformer_big_beta4.yaml",
+   "checkpoint": "C:\\absolute\\path\\to\\melband_roformer_big_beta4.ckpt",
+   "stem": "vocals",
+   "about": {
+    "weights": "https://huggingface.co/pcunwa/Mel-Band-Roformer-big melband_roformer_big_beta4.ckpt (sha256 700a9bd3831d4f7f44cc0019b238774e31045bcbc361fbb69235535c40fc1454) and config_melbandroformer_big_beta4.yaml (sha256 464f21925d2744be6af64cf9ee78d5937d11cfde0b91f819cb1f631acccab603), revision 1508d1ed7c54cb0017b2cbfaabdaf3ca87d2cf74",
+    "weights_license": "none stated by the model repository; private benchmarking only",
+    "code": "msst 0.1.0 (PyPI, ZFTurbo/Music-Source-Separation-Training), Mel-Band RoFormer after lucidrains/BS-RoFormer",
+    "code_license": "MIT",
+    "trained_for": "music vocal separation (vocals / other)"
+   }
+  },
+  {
+   "name": "bandit-v2-multi",
+   "kind": "msst",
+   "sample_rate": 48000,
+   "python": "C:\\absolute\\path\\to\\venv-sep\\Scripts\\python.exe",
+   "model_type": "bandit_v2",
+   "config": "C:\\absolute\\path\\to\\config_dnr_bandit_v2_mus64_mono.yaml",
+   "checkpoint": "C:\\absolute\\path\\to\\checkpoint-multi.msst.pt",
+   "stem": "speech",
+   "about": {
+    "weights": "https://zenodo.org/records/12701995 checkpoint-multi.ckpt (sha256 abcfccf65446752a057f4a302c941479a54b7560ebf8d7bca039d2ea98e64cfc), converted with separate_msst.py --convert-lightning --prefix model.",
+    "weights_license": "CC-BY-SA-4.0",
+    "config": "Music-Source-Separation-Training configs/config_dnr_bandit_v2_mus64.yaml at 6fdad13686bb7e84d029ec66f9dbe76e65c93ebf (sha256 b7062645d3fcd996b2f6da6119775100faf3c5c91f7d048fe8f6d1a1f1453232) with audio.num_channels 1",
+    "code": "msst 0.1.0 (PyPI) bandit_v2, from kwatcharasupat/bandit-v2",
+    "code_license": "MIT (msst), Apache-2.0 (bandit-v2)",
+    "trained_for": "cinematic dialogue / music / effects separation, Divide and Remaster v3 multilingual"
+   }
+  },
+  {
+   "name": "deepfilternet3",
+   "kind": "deep_filter",
+   "sample_rate": 48000,
+   "binary": "C:\\absolute\\path\\to\\deep-filter-0.5.6-x86_64-pc-windows-msvc.exe",
+   "model": "C:\\absolute\\path\\to\\DeepFilterNet3_onnx.tar.gz",
+   "args": ["--compensate-delay"],
+   "pad_end_samples": 1440,
+   "about": {
+    "weights": "https://github.com/Rikorose/DeepFilterNet/raw/v0.5.6/models/DeepFilterNet3_onnx.tar.gz (sha256 c94d91f70911001c946e0fabb4aa9adc37045f45a03b56008cb0c8244cb63616)",
+    "weights_license": "MIT OR Apache-2.0",
+    "code": "https://github.com/Rikorose/DeepFilterNet/releases/tag/v0.5.6 deep-filter-0.5.6-x86_64-pc-windows-msvc.exe (sha256 75e11fa16445f560cb6b021521ddb89e89270d13b83089705d98776f58fd7915)",
+    "code_license": "MIT OR Apache-2.0",
+    "trained_for": "real-time full-band speech enhancement, 48 kHz"
+   }
+  }
+ ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "phases": [
+    {
+      "id": "unit",
+      "timeout_seconds": 1800,
+      "args": ["-m", "not real", "tests"]
+    },
+    {
+      "id": "real-deps",
+      "timeout_seconds": 7200,
+      "args": [
+        "-m",
+        "real",
+        "--ignore=tests/test_real_frozen_bundle.py",
+        "--ignore=tests/test_real_frozen_e2e.py",
+        "--ignore=tests/e0_evidence/test_real_e0_seam.py",
+        "--ignore=tests/overlay_app/test_real_dwm_chrome.py",
+        "--ignore=tests/overlay_app/test_real_gui_layout.py",
+        "--ignore=tests/overlay_app/test_real_settings_dialogs.py",
+        "--ignore=tests/overlay_app/test_real_shortcut_field.py",
+        "--ignore=tests/overlay_app/test_real_tray_icons.py",
+        "--ignore=tests/overlay_app/test_real_tray_flyout.py",
+        "--ignore=tests/overlay_app/test_real_window_chrome.py",
+        "--ignore=tests/overlay_app/test_real_tray.py",
+        "--ignore=tests/overlay_app/test_real_series_palette.py",
+        "--ignore=tests/overlay_app/test_real_error_window.py",
+        "--ignore=tests/test_real_wizard_window.py",
+        "--ignore=tests/lifecycle/test_real_show_in_folder.py",
+        "tests"
+      ]
+    },
+    {
+      "id": "real-gui",
+      "timeout_seconds": 1800,
+      "args": [
+        "-m",
+        "real",
+        "tests/overlay_app/test_real_shortcut_field.py",
+        "tests/overlay_app/test_real_dwm_chrome.py",
+        "tests/overlay_app/test_real_gui_layout.py",
+        "tests/overlay_app/test_real_settings_dialogs.py",
+        "tests/overlay_app/test_real_tray_flyout.py",
+        "tests/overlay_app/test_real_window_chrome.py",
+        "tests/overlay_app/test_real_tray_icons.py",
+        "tests/overlay_app/test_real_tray.py",
+        "tests/overlay_app/test_real_series_palette.py",
+        "tests/overlay_app/test_real_error_window.py",
+        "tests/test_real_wizard_window.py",
+        "tests/lifecycle/test_real_show_in_folder.py"
+      ]
+    },
+    {
+      "id": "frozen-bundle",
+      "timeout_seconds": 1800,
+      "args": ["tests/test_real_frozen_bundle.py"]
+    },
+    {
+      "id": "frozen-external",
+      "timeout_seconds": 1800,
+      "args": [
+        "-m",
+        "frozen_external_llama",
+        "tests/test_real_frozen_e2e.py"
+      ]
+    },
+    {
+      "id": "frozen-owned",
+      "timeout_seconds": 3600,
+      "args": [
+        "-m",
+        "frozen_owned_llama",
+        "tests/test_real_frozen_e2e.py"
+      ]
+    }
+  ]
+}

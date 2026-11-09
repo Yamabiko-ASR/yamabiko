@@ -1,0 +1,27 @@
+# requirements-bench.txt -- benchmark-only dependencies, never shipped.
+#
+# The issue #105 E0 evidence harness can benchmark a non-Whisper decoder
+# candidate (scripts/e0_evidence/nemo_tdt.py, runbook section 5,
+# "Benchmarking a non-Whisper decoder (parakeet-ja)"). It needs onnx-asr,
+# which is not a Yamabiko runtime dependency.
+#
+# Never install this file into the release build venv (.venv):
+# installer/build.ps1 rejects any package that constraints-release.txt does
+# not pin, and the shipped bundle must not change. Use a separate Python 3.12
+# bench venv instead, built from the release set first:
+#
+#   py -3.12 -m venv .venv-bench
+#   .venv-bench\Scripts\python.exe -m pip install -r yamabiko\requirements.txt -c constraints-release.txt
+#   .venv-bench\Scripts\python.exe -m pip install --no-deps -r requirements-bench.txt
+#
+# --no-deps keeps every release pin. onnx-asr's only core dependency is numpy,
+# which the release set already pins; it runs on the release onnxruntime
+# (1.23.2, CPU only). onnx-asr is MIT licensed.
+onnx-asr==0.12.0
+#
+# The ASR bench's sherpa_transducer backend (ReazonSpeech k2) needs
+# sherpa-onnx. The PyPI wheel is CPU only and carries its own onnxruntime DLL,
+# which loads beside the release onnxruntime that Silero VAD uses. sherpa-onnx
+# depends on sherpa-onnx-core alone; both are Apache-2.0.
+sherpa-onnx==1.13.8
+sherpa-onnx-core==1.13.8

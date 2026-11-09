@@ -1,0 +1,36 @@
+# Proper-noun extraction denylist — one surface per line; blank lines and
+# `#` comments are ignored (extractor_fugashi.load_denylist). Surfaces
+# here are dropped by BOTH extractors (extractor_fugashi.py,
+# extractor_sudachi.py) before they can produce a translator prompt hint
+# or enter the learned genre JSON. Use for surfaces too common to be
+# useful hints (the LLM already knows them) or that the taggers mis-tag
+# as proper nouns.
+#
+# NOTE: the denylist does NOT gate furigana. build_ruby
+# (romanization/pipeline.py) looks up every kanji span directly, so a
+# _seed.yaml entry for a denylisted surface still supplies its curated
+# reading. Example carve-out: 日本 — seed reading にほん; the tagger alone
+# would annotate にっぽん. tests/test_romanization_pipeline.py pins the
+# seed/denylist overlap to exactly that carve-out set.
+日本
+代表
+昼
+客
+ワイド
+ショー
+本日
+今日
+明日
+昨日
+全国
+政府
+経済
+政策
+発表
+勝利
+予報
+天気
+最近
+映画
+スポーツ
+ニュース

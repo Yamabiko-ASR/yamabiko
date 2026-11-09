@@ -1,0 +1,22 @@
+# requirements-bench-transformers.txt -- ASR bench only, never shipped.
+#
+# The ASR bench's transformers_asr backend (Qwen3-ASR and Cohere ASR
+# checkpoints, scripts/asr_bench/run.py) needs torch with CUDA, transformers
+# and librosa, none of which Yamabiko ships. Install them into a bench venv
+# that already holds the release set (see requirements-bench.txt), with the
+# release lock as constraints so every release pin stays:
+#
+#   <venv>\Scripts\python.exe -m pip install -r requirements-bench-transformers.txt -c constraints-release.txt
+#
+# Never install this file into the release build venv (.venv).
+#
+# torch 2.11.0 is the newest CUDA 12.8 build (the 12.x line the app targets);
+# the cu128 wheels include sm_120 (RTX 50xx). transformers 5.15.1 is the newest
+# release whose huggingface_hub and tokenizers ranges admit the release pins
+# (5.16 needs tokenizers >= 0.23.1); native Qwen3-ASR support starts at 5.13.
+# librosa is required by transformers' Cohere ASR feature extractor.
+# Licences: torch BSD-3-Clause, transformers Apache-2.0, librosa ISC.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+transformers==5.15.1
+librosa==1.0.0

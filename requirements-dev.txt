@@ -1,0 +1,37 @@
+# Yamabiko development + release-gate tooling.
+#
+# One-stop install for a dev / CI / release-build machine:
+#   pip install -r requirements-dev.txt
+# It `-r`-includes the runtime requirements, so this single file covers
+# both the app's runtime deps AND the test / release-gate tools below.
+#
+# These tools are deliberately kept OUT of yamabiko/requirements.txt so
+# the library's runtime metadata (pyproject dynamic `dependencies` reads
+# only that file) stays lean -- `pip install yamabiko` must not drag in
+# pytest. None of the packages below has a production import: pefile is
+# used only by scripts/audit_bundle_dlls.py + a real test, while psutil and
+# pywinauto are used only by frozen real tests; pytest* is nowhere in
+# yamabiko/.
+#
+# For a fully reproducible release build, pair this with the version
+# lock: pip install -r requirements-dev.txt -c constraints-release.txt
+
+-r yamabiko/requirements.txt
+
+# --- Testing + release tooling ---
+pytest>=8                       # the gate runner itself
+pytest-asyncio>=0.23            # asyncio support for pytest (asyncio_mode = auto in pytest.ini)
+pytest-qt>=4.4                  # Qt widget testing via qtbot fixture
+# Hard deps of the release gate: a fresh box running only
+# `pip install -r yamabiko/requirements.txt` would fail preflight/E2E
+# misleadingly without these explicitly declared.
+# pytest-timeout is required because preflight section 8 passes
+# --timeout=180 and setup.cfg's mutmut runner passes --timeout=30;
+# without the plugin pytest exits 4 ("unrecognized arguments") and the
+# gate reports "real-path suite FAILED" misleadingly.
+# 2.4.0 (2025-05-05) is the current release; no known CVEs.
+pytest-timeout>=2.4             # preflight section 8 + mutmut runner hard-require --timeout
+pefile>=2023.2.7                # PE import parsing for scripts/audit_bundle_dlls.py (preflight section 9)
+psutil>=5.9                     # process-tree assertions in tests/test_real_frozen_e2e.py
+pywinauto==0.6.9                # UI Automation for the frozen wizard E2E only
+ruff>=0.17                      # linter: python -m ruff check <paths> (rules pinned in pyproject.toml)

@@ -1,0 +1,24 @@
+name: Feature request
+description: Something Yamabiko should do that it doesn't.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem or gap?
+      description: Describe the situation where Yamabiko falls short, rather than the solution.
+      placeholder: When I watch variety shows with two fast talkers, the subtitles...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like it to do?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Workarounds you've tried
+    validations:
+      required: false

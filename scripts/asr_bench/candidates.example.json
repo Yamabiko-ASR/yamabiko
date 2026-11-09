@@ -1,0 +1,46 @@
+{
+ "candidates": [
+  {
+   "name": "baseline",
+   "vad": null,
+   "asr": {
+    "backend": "faster_whisper",
+    "model": "kotoba-tech/kotoba-whisper-v2.0-faster",
+    "compute_type": "float16",
+    "beam_size": 5
+   }
+  },
+  {
+   "name": "silero-v6.2",
+   "vad": {
+    "url": "https://github.com/snakers4/silero-vad/raw/v6.2/src/silero_vad/data/silero_vad.onnx",
+    "sha256": "1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3"
+   },
+   "asr": {
+    "backend": "faster_whisper",
+    "model": "kotoba-tech/kotoba-whisper-v2.0-faster",
+    "compute_type": "float16",
+    "beam_size": 5
+   }
+  },
+  {
+   "name": "faster-whisper-ja-760M",
+   "vad": null,
+   "asr": {
+    "backend": "faster_whisper",
+    "model": "M:\\absolute\\path\\to\\faster-whisper-ja-760M",
+    "compute_type": "float16",
+    "beam_size": 5
+   }
+  },
+  {
+   "name": "parakeet-tdt_ctc-0.6b-ja",
+   "vad": null,
+   "asr": {
+    "backend": "parakeet_onnx",
+    "model": "M:\\absolute\\path\\to\\parakeet-tdt_ctc-0.6b-ja-onnx",
+    "compute_type": "float32"
+   }
+  }
+ ]
+}

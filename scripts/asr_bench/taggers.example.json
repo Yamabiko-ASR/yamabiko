@@ -1,0 +1,104 @@
+{
+ "taggers": [
+  {
+   "name": "efficientsed-fmn10-tf256-kd",
+   "kind": "efficientsed",
+   "python": "C:\\absolute\\path\\to\\venv-tagger\\Scripts\\python.exe",
+   "repo": "C:\\absolute\\path\\to\\EfficientSED",
+   "checkpoint": "C:\\absolute\\path\\to\\fmn10+tf-256_advanced-kd-weak-strong.pt",
+   "model": "fmn10",
+   "seq_model_type": "tf",
+   "seq_model_dim": 256,
+   "hop_frames": 12,
+   "lookahead_frames": 12,
+   "batch": 32,
+   "about": {
+    "weights": "https://github.com/theMoro/EfficientSED/releases/download/v0.0.1/fmn10+tf-256_advanced-kd-weak-strong.pt (20304913 bytes, sha256 7d5326a485b742b323b33dd2bcb366606b614b2a5deaa5e452ef34ddedb9797c)",
+    "weights_license": "MIT (EfficientSED repository and release)",
+    "code": "https://github.com/theMoro/EfficientSED at e3449bfd1f4922b81d82410ed842653f462bfca8 (inference code of EfficientSED and the PretrainedSED transformers)",
+    "code_license": "MIT",
+    "model": "frame-wise MobileNetV3 fmn10 with two 256-d transformer blocks, about 5 M parameters; trained on AudioSet Weak then AudioSet Strong with the advanced knowledge-distillation setup (PSDS1 45.25 in the EUSIPCO 2025 paper, arXiv 2503.11373)",
+    "trained_for": "AudioSet Strong sound event detection, 447 classes at 40 ms"
+   }
+  },
+  {
+   "name": "efficientsed-fmn10-tf256-kd-offline",
+   "kind": "efficientsed",
+   "python": "C:\\absolute\\path\\to\\venv-tagger\\Scripts\\python.exe",
+   "repo": "C:\\absolute\\path\\to\\EfficientSED",
+   "checkpoint": "C:\\absolute\\path\\to\\fmn10+tf-256_advanced-kd-weak-strong.pt",
+   "model": "fmn10",
+   "seq_model_type": "tf",
+   "seq_model_dim": 256,
+   "hop_frames": 126,
+   "lookahead_frames": 62,
+   "batch": 32,
+   "about": {
+    "weights": "https://github.com/theMoro/EfficientSED/releases/download/v0.0.1/fmn10+tf-256_advanced-kd-weak-strong.pt (20304913 bytes, sha256 7d5326a485b742b323b33dd2bcb366606b614b2a5deaa5e452ef34ddedb9797c)",
+    "weights_license": "MIT (EfficientSED repository and release)",
+    "code": "https://github.com/theMoro/EfficientSED at e3449bfd1f4922b81d82410ed842653f462bfca8 (inference code of EfficientSED and the PretrainedSED transformers)",
+    "code_license": "MIT",
+    "model": "frame-wise MobileNetV3 fmn10 with two 256-d transformer blocks, about 5 M parameters; trained on AudioSet Weak then AudioSet Strong with the advanced knowledge-distillation setup (PSDS1 45.25 in the EUSIPCO 2025 paper, arXiv 2503.11373)",
+    "trained_for": "AudioSet Strong sound event detection, 447 classes at 40 ms"
+   }
+  },
+  {
+   "name": "efficientsed-fmn10-tf256-kd-onnx",
+   "kind": "efficientsed_onnx",
+   "onnx": "C:\\absolute\\path\\to\\fmn10+tf-256_advanced-kd-weak-strong.onnx",
+   "hop_frames": 12,
+   "lookahead_frames": 12,
+   "batch": 1,
+   "about": {
+    "weights": "fmn10+tf-256_advanced-kd-weak-strong.onnx (21049634 bytes, sha256 b0fdb11318fb666da2f21e59835d5e281278476854cf80442edd75446c81c7f0), written by scripts/asr_bench/export_tagger_onnx.py from https://github.com/theMoro/EfficientSED/releases/download/v0.0.1/fmn10+tf-256_advanced-kd-weak-strong.pt (20304913 bytes, sha256 7d5326a485b742b323b33dd2bcb366606b614b2a5deaa5e452ef34ddedb9797c)",
+    "weights_license": "MIT (EfficientSED repository and release; the ONNX file is a format conversion of those weights)",
+    "code": "https://github.com/theMoro/EfficientSED at e3449bfd1f4922b81d82410ed842653f462bfca8 (model and mel frontend, exported with torch 2.8.0 at opset 17)",
+    "code_license": "MIT",
+    "model": "frame-wise MobileNetV3 fmn10 with two 256-d transformer blocks, about 5 M parameters; trained on AudioSet Weak then AudioSet Strong with the advanced knowledge-distillation setup (PSDS1 45.25 in the EUSIPCO 2025 paper, arXiv 2503.11373); mel frontend inside the graph",
+    "trained_for": "AudioSet Strong sound event detection, 447 classes at 40 ms"
+   }
+  },
+  {
+   "name": "efficientsed-fmn10-tf256",
+   "kind": "efficientsed",
+   "python": "C:\\absolute\\path\\to\\venv-tagger\\Scripts\\python.exe",
+   "repo": "C:\\absolute\\path\\to\\EfficientSED",
+   "checkpoint": "C:\\absolute\\path\\to\\fmn10+tf-256_strong.pt",
+   "model": "fmn10",
+   "seq_model_type": "tf",
+   "seq_model_dim": 256,
+   "hop_frames": 12,
+   "lookahead_frames": 12,
+   "batch": 32,
+   "about": {
+    "weights": "https://github.com/theMoro/EfficientSED/releases/download/v0.0.1/fmn10+tf-256_strong.pt (20341877 bytes, sha256 20510a4235433d3d0867a812fbb1f985c4221e54eb338f5a5842f50d9cff2683)",
+    "weights_license": "MIT (EfficientSED repository and release)",
+    "code": "https://github.com/theMoro/EfficientSED at e3449bfd1f4922b81d82410ed842653f462bfca8 (inference code of EfficientSED and the PretrainedSED transformers)",
+    "code_license": "MIT",
+    "model": "frame-wise MobileNetV3 fmn10 with two 256-d transformer blocks, about 5 M parameters; AudioSet Strong training without the advanced distillation (PSDS1 43.86)",
+    "trained_for": "AudioSet Strong sound event detection, 447 classes at 40 ms"
+   }
+  },
+  {
+   "name": "pretrainedsed-beats-strong",
+   "kind": "efficientsed",
+   "python": "C:\\absolute\\path\\to\\venv-tagger\\Scripts\\python.exe",
+   "repo": "C:\\absolute\\path\\to\\EfficientSED",
+   "checkpoint": "C:\\absolute\\path\\to\\BEATs_strong_1.pt",
+   "model": "BEATs",
+   "seq_model_type": null,
+   "seq_model_dim": null,
+   "hop_frames": 12,
+   "lookahead_frames": 12,
+   "batch": 16,
+   "about": {
+    "weights": "https://github.com/fschmid56/PretrainedSED/releases/download/v0.0.1/BEATs_strong_1.pt (364091999 bytes, sha256 db13a79ae90a0cfd0f9911a6a1d8cdb89324322bee642dcfe32de022123b8b54)",
+    "weights_license": "MIT (PretrainedSED repository and release; the BEATs backbone is microsoft/unilm, MIT)",
+    "code": "https://github.com/theMoro/EfficientSED at e3449bfd1f4922b81d82410ed842653f462bfca8 (inference code of EfficientSED and the PretrainedSED transformers)",
+    "code_license": "MIT",
+    "model": "BEATs (about 90 M parameters) fine-tuned on AudioSet Strong with ensemble distillation (PSDS1 46.5, ICASSP 2025, arXiv 2409.09546)",
+    "trained_for": "AudioSet Strong sound event detection, 447 classes at 40 ms"
+   }
+  }
+ ]
+}

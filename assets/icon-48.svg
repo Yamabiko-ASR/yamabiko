@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs><clipPath id="tile"><rect width="48" height="48" rx="10"/></clipPath></defs>
+  <rect width="48" height="48" rx="10" fill="#d2452f"/>
+  <path fill="#fff" d="M10 13H16V20H21V3H27V20H32V13H38V26H10Z"/>
+  <polyline clip-path="url(#tile)" points="-2,43 11,35 17,38 30,31.5 50,41" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+</svg>

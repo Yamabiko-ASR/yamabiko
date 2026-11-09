@@ -1,0 +1,14 @@
+# Fine-tuning pilot venv for the 760M (see docs/ASR-FINETUNE.md). Compile the
+# lock with the CUDA 12.8 PyTorch wheels:
+#   uv pip compile scripts/asr_finetune/requirements-ft.in --torch-backend cu128
+#     --python-version 3.12 --python-platform x86_64-pc-windows-msvc
+#     -o scripts/asr_finetune/requirements-ft.lock.txt
+torch==2.11.0
+# The production pin (constraints-release.txt). Its Transformers converter
+# needs transformers 4.x.
+ctranslate2==4.8.3
+transformers<5
+peft
+safetensors
+huggingface_hub
+numpy

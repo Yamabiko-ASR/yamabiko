@@ -1,0 +1,10 @@
+preview-night.jpg
+
+"Nakasu Yatai Stalls (19979437930)" by Yoshikazu TAKADA from Tokyo, Japan,
+licensed under Creative Commons Attribution 2.0 Generic (CC BY 2.0).
+Source: https://commons.wikimedia.org/wiki/File:Nakasu_Yatai_Stalls_(19979437930).jpg
+Changes: scaled to 1128 px wide and cropped to 1128 x 464 px (72% of the way
+down) to sit behind the subtitle preview in Yamabiko's Settings window.
+
+License: https://creativecommons.org/licenses/by/2.0/
+Legal code: https://creativecommons.org/licenses/by/2.0/legalcode

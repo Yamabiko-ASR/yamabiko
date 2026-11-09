@@ -1,0 +1,14 @@
+# Canonical evidence fixtures are compared byte for byte; never convert
+# their line endings on checkout.
+tests/e0_evidence/fixtures/*.jsonl -text
+# Raw PCM audio fixtures are binary sample data.
+*.s16le binary
+# ONNX model graphs are binary protobuf.
+*.onnx binary
+# Bundled fonts are binary.
+*.ttf binary
+# Installer bitmaps (installer/art) are binary.
+*.bmp binary
+# The license page's RTF is generated with LF line endings and compared
+# with the generator's output; never convert it on checkout.
+installer/LICENSE.rtf -text

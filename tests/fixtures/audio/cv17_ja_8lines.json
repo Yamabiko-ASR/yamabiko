@@ -1,0 +1,57 @@
+{
+  "source": "https://huggingface.co/datasets/fsicoli/common_voice_17_0",
+  "revision": "8262c16bf297c87a9cd88c51997c4758ed7a8ba2",
+  "license": "CC0-1.0",
+  "attribution": "Mozilla Common Voice 17.0, Japanese test split (via fsicoli/common_voice_17_0)",
+  "sample_rate": 16000,
+  "lines": [
+    {
+      "clip": "common_voice_ja_19486649.mp3",
+      "sentence": "ピラミッドを築くだけの苦労が、そこにそそがれたはずであった。",
+      "start_sample": 8000,
+      "end_sample": 113216
+    },
+    {
+      "clip": "common_voice_ja_19499629.mp3",
+      "sentence": "新しい靴をはいて出かけます。",
+      "start_sample": 129216,
+      "end_sample": 189120
+    },
+    {
+      "clip": "common_voice_ja_19517025.mp3",
+      "sentence": "毎日忙しいので、あまり休むことができません。",
+      "start_sample": 205120,
+      "end_sample": 287680
+    },
+    {
+      "clip": "common_voice_ja_19523283.mp3",
+      "sentence": "空が少し曇ってきました。",
+      "start_sample": 303680,
+      "end_sample": 369344
+    },
+    {
+      "clip": "common_voice_ja_19547304.mp3",
+      "sentence": "目が悪いので、眼鏡をかけます。",
+      "start_sample": 385344,
+      "end_sample": 450240
+    },
+    {
+      "clip": "common_voice_ja_19555949.mp3",
+      "sentence": "おとといデパートで新しい靴を買いました。",
+      "start_sample": 466240,
+      "end_sample": 556864
+    },
+    {
+      "clip": "common_voice_ja_19580185.mp3",
+      "sentence": "母に誕生日のプレゼントをあげました。",
+      "start_sample": 572864,
+      "end_sample": 649280
+    },
+    {
+      "clip": "common_voice_ja_19620102.mp3",
+      "sentence": "仕事が終わったら、夕飯を食べに行きます。",
+      "start_sample": 665280,
+      "end_sample": 740544
+    }
+  ]
+}
