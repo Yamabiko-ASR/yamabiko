@@ -443,23 +443,24 @@ def test_real_github_api_handles_bootstrap_or_returns_sensible_payload():
     except Exception as exc:
         pytest.skip(f"GitHub API unreachable: {exc!r}")
 
+    # "0.0.0" is the baseline: it must be a valid version, or the checker
+    # treats the local version as unreadable and quietly returns None.
     if probe.status_code == 404:
-        assert check_for_update("0.0.0-test") is None
+        assert check_for_update("0.0.0") is None
         return
     if probe.status_code in (403, 429):
         pytest.skip(f"GitHub rate-limited ({probe.status_code}) — try again later")
     if probe.status_code != 200:
         pytest.skip(f"unexpected GitHub API status {probe.status_code}")
     if not probe.json():
-        assert check_for_update("0.0.0-test") is None
+        assert check_for_update("0.0.0") is None
         return
 
     # Now run the real check — it should hit the same endpoint cleanly.
-    result = check_for_update("0.0.0-test")  # force remote > local path
-    # Result is either None (shouldn't happen with 0.0.0-test baseline) or
-    # a (version, url) tuple.
+    result = check_for_update("0.0.0")  # force remote > local path
+    # Every published release is newer than 0.0.0, so this must not be None.
     assert result is not None, (
-        "check_for_update returned None against 0.0.0-test baseline — "
+        "check_for_update returned None against the 0.0.0 baseline — "
         "schema drift on the real API response?"
     )
     version, url = result

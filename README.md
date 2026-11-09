@@ -95,7 +95,7 @@ Yamabiko doesn't support AMD or Intel graphics cards, CPU-only inference, macOS,
 
 ## Install Yamabiko
 
-1. Download `yamabiko-<version>-setup.exe` (about 1.1 GB) from the [latest release](https://github.com/Yamabiko-ASR/yamabiko/releases/latest).
+1. Download `yamabiko-<version>-setup.exe` (about 1.5 GB) from the [latest release](https://github.com/Yamabiko-ASR/yamabiko/releases/latest).
 2. Run the installer. It installs into `%LOCALAPPDATA%\Yamabiko` for your account only, without asking for administrator rights. If Yamabiko is already installed, the installer offers to update it, and your settings stay. When an update needs new models, setup opens the next time Yamabiko starts and downloads only what's missing. Leave **Start Yamabiko** selected on the last page to start Yamabiko right away.
 3. This beta isn't signed yet, so Windows might show "Windows protected your PC". Click **More info**, and then click **Run anyway**.
 
